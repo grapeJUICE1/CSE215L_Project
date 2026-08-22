@@ -40,6 +40,19 @@ public abstract class User implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if(!(o instanceof User)) return false;
+        User other =  (User) o;
+        return username.equals(other.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return username.hashCode();
+    }
+
+    @Override
     public String toString() {
         return String.format("%s (@%s) [%s]", displayName, username, getClass().getSimpleName());
     }
