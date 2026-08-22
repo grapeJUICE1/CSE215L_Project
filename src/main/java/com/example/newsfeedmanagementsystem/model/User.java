@@ -6,6 +6,7 @@ public abstract class User implements Serializable {
     private String username;
     private String passwordHash;
     private String displayName;
+    private boolean isBanned = false;
     private static final long serialVersionUID = 1L;
 
     User(String username, String passwordHash, String displayName) {
@@ -37,6 +38,14 @@ public abstract class User implements Serializable {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public boolean isBanned() {
+       return isBanned;
+    }
+
+    public void setBanned(boolean banned) {
+        isBanned = banned;
     }
 
     @Override
