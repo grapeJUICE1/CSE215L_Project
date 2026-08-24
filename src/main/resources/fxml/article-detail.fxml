@@ -17,7 +17,6 @@
             styleClass="root-pane"
             prefWidth="1000" prefHeight="700">
 
-    <!-- ===== TOP NAV ===== -->
     <top>
         <HBox alignment="CENTER_LEFT" spacing="16" styleClass="top-nav">
             <Hyperlink text="← Back to Feed" styleClass="nav-link" onAction="#onBackClicked"/>
@@ -30,7 +29,6 @@
         </HBox>
     </top>
 
-    <!-- ===== ARTICLE + COMMENTS (scrollable) ===== -->
     <center>
         <ScrollPane fitToWidth="true" styleClass="scroll-pane">
             <HBox alignment="TOP_CENTER">
@@ -39,11 +37,10 @@
                         <Insets top="30" right="30" bottom="30" left="30"/>
                     </padding>
 
-                    <!-- Article content -->
                     <VBox spacing="10" styleClass="card">
                         <Label fx:id="categoryTag" styleClass="tag-chip"/>
                         <Label fx:id="titleLabel" styleClass="article-title" wrapText="true"/>
-                        <Label fx:id="metaLabel" styleClass="article-meta"/>
+                        <HBox fx:id="metaContainer" spacing="6" alignment="CENTER_LEFT"/>
                         <Label fx:id="contentLabel" styleClass="article-body" wrapText="true">
                             <VBox.margin>
                                 <Insets top="10"/>
@@ -59,7 +56,6 @@
                         </HBox>
                     </VBox>
 
-                    <!-- New comment box -->
                     <VBox spacing="8" styleClass="card">
                         <Label text="Add a comment" styleClass="field-label"/>
                         <TextArea fx:id="newCommentField" promptText="Write a comment..." styleClass="input-field"
@@ -68,7 +64,6 @@
                                 onAction="#onPostCommentClicked"/>
                     </VBox>
 
-                    <!-- Comments list -->
                     <Label text="Comments" styleClass="field-label"/>
                     <VBox fx:id="commentsContainer" spacing="12"/>
 

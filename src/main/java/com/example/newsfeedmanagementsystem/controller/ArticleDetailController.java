@@ -5,10 +5,7 @@ import com.example.newsfeedmanagementsystem.model.*;
 import com.example.newsfeedmanagementsystem.repository.ArticleRepository;
 import com.example.newsfeedmanagementsystem.repository.UserRepository;
 import com.example.newsfeedmanagementsystem.service.ModerationService;
-import com.example.newsfeedmanagementsystem.util.AppState;
-import com.example.newsfeedmanagementsystem.util.SceneManager;
-import com.example.newsfeedmanagementsystem.util.Session;
-import com.example.newsfeedmanagementsystem.util.ToastManager;
+import com.example.newsfeedmanagementsystem.util.*;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,8 +19,6 @@ public class ArticleDetailController {
     private Label categoryTag;
     @FXML
     private Label titleLabel;
-    @FXML
-    private Label metaLabel;
     @FXML
     private Label contentLabel;
     @FXML
@@ -43,7 +38,9 @@ public class ArticleDetailController {
     @FXML
     private Button deleteButton;
     @FXML
-    private Button changeTypeButton; // optional
+    private Button changeTypeButton;
+    @FXML
+    private HBox metaContainer;
 
     private ArticleRepository articleRepository;
     private UserRepository userRepository;
@@ -71,7 +68,6 @@ public class ArticleDetailController {
             return;
         }
 
-        // Permissions
         User current = Session.getCurrentUser();
         boolean isAuthor = current != null && current.equals(article.getAuthor());
         boolean isAdmin = current instanceof Admin;
@@ -129,7 +125,6 @@ public class ArticleDetailController {
         categoryTag.setText(article.getCategory());
         titleLabel.setText(article.getTitle());
 
-        HBox metaContainer = new HBox(6);
         metaContainer.setAlignment(Pos.CENTER_LEFT);
 
         Label authorLabel = new Label("By " + article.getAuthor().getDisplayName());
@@ -139,7 +134,7 @@ public class ArticleDetailController {
             SceneManager.switchTo("profile");
         });
 
-        Label timestampLabel = new Label(" • " + article.getPublishedAt().toString()); // use formatter later
+        Label timestampLabel = new Label(" • " + DateUtils.format(article.getPublishedAt()));
         timestampLabel.getStyleClass().add("article-meta");
         metaContainer.getChildren().addAll(authorLabel, timestampLabel);
 
@@ -171,7 +166,7 @@ public class ArticleDetailController {
         content.getStyleClass().add("article-body");
         content.setWrapText(true);
 
-        Label meta = new Label(comment.getTimestamp().toString()); // format later
+        Label meta = new Label(DateUtils.format(comment.getTimestamp()));
         meta.getStyleClass().add("article-meta");
 
         Button replyButton = new Button("Reply");
@@ -239,7 +234,7 @@ public class ArticleDetailController {
         } catch (UnauthorizedActionException e) {
             ToastManager.error(e.getMessage());
         }
-        userRepository.save(); // persist bookmarks
+        userRepository.save();
         updateBookmarkButton();
         ToastManager.success(Session.getCurrentUser().isBookmarked(article.getId()) ? "Bookmarked" : "Unbookmarked");
     }
@@ -317,7 +312,6 @@ public class ArticleDetailController {
 
     @FXML
     public void onDeleteClicked() {
-        // Optional: add confirmation dialog (we'll add later)
         try {
             moderationService.deleteArticle(article);
             ToastManager.success("Article deleted");

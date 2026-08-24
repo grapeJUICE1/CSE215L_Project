@@ -96,7 +96,11 @@ public class FeedController {
 
                     Label statsLabel = new Label(" • " + article.getLikes() + " likes • " + article.getComments().size() + " comments");
                     statsLabel.getStyleClass().add("article-meta");
-                    metaContainer.getChildren().addAll(authorLabel, statsLabel);
+
+                    Label dateLabel = new Label(DateUtils.format(article.getPublishedAt()));
+                    dateLabel.getStyleClass().add("article-meta");
+
+                    metaContainer.getChildren().addAll(authorLabel, statsLabel, dateLabel);
 
                     Label tag = new Label(article.getCategory());
                     tag.getStyleClass().add("tag-chip");
@@ -210,6 +214,16 @@ public class FeedController {
     public void onArticleClicked(Article article) {
         AppState.setSelectedArticle(article);
         SceneManager.switchTo("article-detail");
+    }
+
+    @FXML
+    public void onResetFiltersClicked() {
+        searchField.clear();
+        categoryFilterBox.setValue(null);
+        sortModeBox.setValue(null);
+        typeFilterBox.setValue("All");
+        currentPage = 0;
+        refreshFeed();
     }
 
     @FXML

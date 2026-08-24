@@ -7,10 +7,7 @@ import com.example.newsfeedmanagementsystem.model.*;
 import com.example.newsfeedmanagementsystem.repository.ArticleRepository;
 import com.example.newsfeedmanagementsystem.repository.UserRepository;
 import com.example.newsfeedmanagementsystem.service.AuthService;
-import com.example.newsfeedmanagementsystem.util.AppState;
-import com.example.newsfeedmanagementsystem.util.SceneManager;
-import com.example.newsfeedmanagementsystem.util.Session;
-import com.example.newsfeedmanagementsystem.util.ToastManager;
+import com.example.newsfeedmanagementsystem.util.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -42,7 +39,7 @@ public class ProfileController {
     @FXML
     private ListView<Article> userArticlesListView;
     @FXML
-    private ListView<Article> bookmarksListView; // NEW
+    private ListView<Article> bookmarksListView;
     @FXML
     private TabPane profileTabPane;
 
@@ -140,7 +137,7 @@ public class ProfileController {
         Label tag = new Label(article.getCategory());
         tag.getStyleClass().add("tag-chip");
 
-        Label meta = new Label(article.getLikes() + " likes • " + article.getComments().size() + " comments • " + article.getPublishedAt());
+        Label meta = new Label(article.getLikes() + " likes • " + article.getComments().size() + " comments • " + DateUtils.format(article.getPublishedAt()));
         meta.getStyleClass().add("article-meta");
 
         card.getChildren().addAll(title, tag, meta);

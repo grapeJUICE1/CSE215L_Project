@@ -35,7 +35,7 @@
 
                 <ComboBox fx:id="typeFilterBox" promptText="Type" styleClass="input-field"
                           onAction="#onFilterChanged"/>
-
+                <Button text="Reset Filters" styleClass="button-secondary" onAction="#onResetFiltersClicked"/>
                 <Region HBox.hgrow="ALWAYS"/>
 
                 <Button fx:id="publishButton" text="+ Publish" styleClass="primary-btn"
