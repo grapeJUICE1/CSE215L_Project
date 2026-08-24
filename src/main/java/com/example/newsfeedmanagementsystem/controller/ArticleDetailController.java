@@ -13,6 +13,7 @@ import com.example.newsfeedmanagementsystem.util.Session;
 import com.example.newsfeedmanagementsystem.util.ToastManager;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -73,7 +74,23 @@ public class ArticleDetailController {
     private void renderArticle() {
         categoryTag.setText(article.getCategory());
         titleLabel.setText(article.getTitle());
-        metaLabel.setText("By " + article.getAuthor().getDisplayName() + " • " + article.getPublishedAt());
+
+        HBox metaContainer = new HBox(6);
+        metaContainer.setAlignment(Pos.CENTER_LEFT);
+
+        Label authorLabel = new Label("By " + article.getAuthor().getDisplayName());
+        authorLabel.getStyleClass().add("author-link");
+        authorLabel.setOnMouseClicked(e -> {
+            AppState.setViewedProfileUser(article.getAuthor());
+            SceneManager.switchTo("profile");
+        });
+
+        Label timestampLabel = new Label(" • " + article.getPublishedAt());
+        timestampLabel.getStyleClass().add("article-meta");
+
+        metaContainer.getChildren().addAll(authorLabel, timestampLabel);
+
+
         contentLabel.setText(article.getContent());
         likeCountLabel.setText(article.getLikes() + " likes");
         renderComments();
@@ -87,12 +104,16 @@ public class ArticleDetailController {
     }
 
     private VBox buildCommentNode(Comment comment, int depth) {
-        VBox box = new VBox(4);
+        VBox box = new VBox(6);
         box.getStyleClass().add("card");
         box.setPadding(new Insets(10, 10, 10, 10 + depth * 24));
 
         Label author = new Label(comment.getAuthor().getDisplayName());
-        author.getStyleClass().add("field-label");
+        author.getStyleClass().add("author-link");
+        author.setOnMouseClicked(e -> {
+            AppState.setViewedProfileUser(comment.getAuthor());
+            SceneManager.switchTo("profile");
+        });
 
         Label content = new Label(comment.getContent());
         content.getStyleClass().add("article-body");

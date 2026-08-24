@@ -7,8 +7,11 @@ import com.example.newsfeedmanagementsystem.repository.UserRepository;
 import com.example.newsfeedmanagementsystem.service.FeedService;
 import com.example.newsfeedmanagementsystem.util.*;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Box;
 
 import java.util.List;
 
@@ -20,7 +23,6 @@ public class FeedController {
     @FXML private Button publishButton;
     @FXML private Label pageLabel;
     @FXML private Hyperlink adminLink;
-    @FXML private Hyperlink profileLink;
 
 
     private UserRepository userRepository;
@@ -40,43 +42,59 @@ public class FeedController {
        sortModeBox.getItems().addAll("recency", "engagement");
 
        boolean canPublish = Session.getCurrentUser() != null && Session.getCurrentUser().canPublish();
-           publishButton.setVisible(canPublish);
-           publishButton.setManaged(canPublish);
+       System.out.println(canPublish);
+       publishButton.setVisible(canPublish);
+       publishButton.setManaged(canPublish);
 
        boolean isAdmin = Session.getCurrentUser() != null && Session.getCurrentUser() instanceof Admin;
-           adminLink.setVisible(isAdmin);
-           adminLink.setManaged(isAdmin);
+       adminLink.setVisible(isAdmin);
+       adminLink.setManaged(isAdmin);
 
        articleListView.setCellFactory(list->new ListCell<Article>(){
            @Override
            protected void updateItem(Article article, boolean empty) {
                super.updateItem(article, empty);
-               if(empty || article == null) {
+
+               if (empty || article == null) {
                    setText(null);
-                    setGraphic(null);
+                   setGraphic(null);
                } else {
-                   VBox card =  new VBox(6);
+                   VBox card = new VBox(6);
                    card.getStyleClass().add("card");
 
                    Label title = new Label(article.getTitle());
                    title.getStyleClass().add("article-title");
 
-                   Label meta = new Label("By " + article.getAuthor().getDisplayName()
-                   + " • " + article.getLikes() + " likes • "  + article.getComments().size() + " comments");
+                   HBox metaContainer = new HBox(6);
+                   metaContainer.setAlignment(Pos.CENTER_LEFT);
 
-                   meta.getStyleClass().add("tag-chip");
+                   Label authorLabel = new Label("By " + article.getAuthor().getDisplayName());
+                   authorLabel.getStyleClass().add("author-link");
+
+                   authorLabel.setOnMouseClicked(e -> {
+                       e.consume(); // Prevent launching the main article detail view
+                       AppState.setViewedProfileUser(article.getAuthor());
+                       SceneManager.switchTo("profile");
+                   });
+
+                   Label statsLabel = new Label(" • " + article.getLikes() + " likes • " + article.getComments().size() + " comments");
+                   statsLabel.getStyleClass().add("article-meta");
+                   metaContainer.getChildren().addAll(authorLabel, statsLabel);
 
                    Label tag = new Label(article.getCategory());
                    tag.getStyleClass().add("tag-chip");
 
-                   Label snippet = new Label(article.getContent().length()> 120 ?
-                           article.getContent().substring(0, 120) + "..." : article.getContent());
+                   String contentSnippet = article.getContent().length() > 120
+                           ? article.getContent().substring(0, 120) + "..."
+                           : article.getContent();
 
+                   Label snippet = new Label(contentSnippet);
                    snippet.getStyleClass().add("article-body");
                    snippet.setWrapText(true);
 
-                   card.getChildren().addAll(title, tag, snippet,meta);
-                   card.setOnMouseClicked(e->onArticleClicked(article));
+                   // Added metaContainer into card children list
+                   card.getChildren().addAll(title, metaContainer, tag, snippet);
+                   card.setOnMouseClicked(e -> onArticleClicked(article));
 
                    setGraphic(card);
                    setText(null);
@@ -126,6 +144,7 @@ public class FeedController {
     }
 
     @FXML public void onProfileClicked(){
+        AppState.setViewedProfileUser(null);
         SceneManager.switchTo("profile");
     }
     @FXML public void onAdminClicked(){

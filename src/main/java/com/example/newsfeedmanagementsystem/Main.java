@@ -9,7 +9,6 @@ public class Main {
     public static void main(String[] args) throws Exception {
         UserRepository userRepo = new UserRepository();
         ArticleRepository articleRepo = new ArticleRepository();
-        NotificationRepository notifRepo = new NotificationRepository();
 
         AuthService authService = new AuthService(userRepo);
         FeedService feedService = new FeedService();

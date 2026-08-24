@@ -66,7 +66,13 @@ public class AuthService {
         if(!valid)
             throw new InvalidCredentialsException("Invalid username or password");
 
-        currentUser.setPasswordHash(PasswordHasher.hashPassword(newPassword));
-        userRepository.save();
-    }
+        String newHash = PasswordHasher.hashPassword(newPassword);
+        currentUser.setPasswordHash(newHash);
+        try {
+            User repoUser = userRepository.findUserByUsername(currentUser.getUsername());
+            repoUser.setPasswordHash(newHash);
+        } catch (UserNotFoundException e) {
+        }
+
+        userRepository.save();    }
 }
