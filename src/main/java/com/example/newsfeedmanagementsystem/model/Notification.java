@@ -36,10 +36,6 @@ public class Notification implements Serializable {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public boolean isRead() {
         return isRead;
     }

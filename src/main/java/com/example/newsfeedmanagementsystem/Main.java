@@ -1,43 +1,65 @@
 package com.example.newsfeedmanagementsystem;
 
-import com.example.newsfeedmanagementsystem.exception.DuplicateUserException;
-import com.example.newsfeedmanagementsystem.model.BreakingNews;
-import com.example.newsfeedmanagementsystem.model.Journalist;
-import com.example.newsfeedmanagementsystem.model.RegularUser;
-import com.example.newsfeedmanagementsystem.repository.ArticleRepository;
-import com.example.newsfeedmanagementsystem.repository.UserRepository;
+import com.example.newsfeedmanagementsystem.model.*;
+import com.example.newsfeedmanagementsystem.repository.*;
+import com.example.newsfeedmanagementsystem.service.*;
+import com.example.newsfeedmanagementsystem.util.Session;
 
 public class Main {
-    public static void main(String[] args) throws DuplicateUserException {
-        UserRepository userRepository = new UserRepository();
-        ArticleRepository articleRepository = new ArticleRepository();
+    public static void main(String[] args) throws Exception {
+        UserRepository userRepo = new UserRepository();
+        ArticleRepository articleRepo = new ArticleRepository();
+        NotificationRepository notifRepo = new NotificationRepository();
 
-        RegularUser user1 = new RegularUser("Habib" , "123" , "habiba");
-        Journalist user2 = new Journalist("Labib" , "123" , "labiba");
+        AuthService authService = new AuthService(userRepo);
+        FeedService feedService = new FeedService();
+        ModerationService modService = new ModerationService(userRepo, articleRepo);
 
-        userRepository.addUser(user1);
-        userRepository.addUser(user2);
+        User journalist = authService.register("labib", "pass123", "Labib", "Journalist");
+        User reader = authService.register("habib", "pass123", "Habib", "USER");
+        User admin = authService.register("root", "adminpass", "Root Admin", "ADMIN");
 
-        BreakingNews news1 = new BreakingNews("Lobotomy" , "Lorem Ipsum Dolor" ,user2, "Business");
-        articleRepository.addArticle(news1);
+        System.out.println("--- Registered ---");
+        System.out.println(journalist);
+        System.out.println(reader);
+        System.out.println(admin);
 
-        System.out.println("Before saving");
-        System.out.println(user1);
-        System.out.println(user2);
-        System.out.println(news1);
+        User loggedInJournalist = authService.login("labib", "pass123");
+        Article article = new BreakingNews("City Floods", "Heavy rain causes flooding downtown", (Journalist) loggedInJournalist, "Weather");
+        articleRepo.addArticle(article);
 
-        userRepository.save();
-        articleRepository.save();
+        System.out.println("--- Published ---");
+        System.out.println(article);
 
-        UserRepository userRepository2 = new UserRepository();
-        ArticleRepository articleRepository2 = new ArticleRepository();
+        User loggedInReader = authService.login("habib", "pass123");
+        article.like();
+        article.addComment(new Comment(loggedInReader, "Stay safe everyone!"));
 
-        userRepository2.load();
-        articleRepository2.load();
+        System.out.println("--- After interaction ---");
+        System.out.println(article);
+        article.getComments().forEach(System.out::println);
 
-        System.out.println("After saving");
+        var feed = feedService.getFeed(articleRepo.getAllArticles(), null, "Weather", null, "recency", 0, 10);
+        System.out.println("--- Feed (Weather category) ---");
+        feed.forEach(System.out::println);
 
-        userRepository2.getAllUsers().forEach(System.out::println);
-        articleRepository2.getAllArticles().forEach(System.out::println);
+        User loggedInAdmin = authService.login("root", "adminpass");
+        modService.banUser(reader);
+        System.out.println("--- After ban ---");
+        System.out.println(reader);
+
+        try {
+            authService.login("habib", "pass123");
+        } catch (Exception e) {
+            System.out.println("Expected failure: " + e.getMessage());
+        }
+
+        userRepo.save();
+        articleRepo.save();
+
+        UserRepository userRepo2 = new UserRepository();
+        userRepo2.load();
+        System.out.println("--- Reloaded users ---");
+        userRepo2.getAllUsers().forEach(System.out::println);
     }
 }

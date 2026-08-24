@@ -10,6 +10,7 @@ import com.example.newsfeedmanagementsystem.model.RegularUser;
 import com.example.newsfeedmanagementsystem.model.User;
 import com.example.newsfeedmanagementsystem.util.PasswordHasher;
 import com.example.newsfeedmanagementsystem.repository.UserRepository;
+import com.example.newsfeedmanagementsystem.util.Session;
 
 public class AuthService {
     UserRepository userRepository;
@@ -54,17 +55,18 @@ public class AuthService {
         boolean valid = PasswordHasher.checkPassword(password, user.getPasswordHash());
         if(!valid)
             throw new InvalidCredentialsException("Invalid username or password");
+
+        Session.login(user);
         return user;
     }
 
-    public void resetPassword(String username, String oldPassword,String newPassword) throws UserNotFoundException, InvalidCredentialsException
-    {
-        User user = userRepository.findUserByUsername(username);
-        boolean valid = PasswordHasher.checkPassword(oldPassword, user.getPasswordHash());
+    public void changePassword(String oldPassword,String newPassword) throws  InvalidCredentialsException, UnauthorizedActionException {
+        User currentUser = Session.getCurrentUser();
+        boolean valid = PasswordHasher.checkPassword(oldPassword, currentUser.getPasswordHash());
         if(!valid)
             throw new InvalidCredentialsException("Invalid username or password");
 
-        user.setPasswordHash(PasswordHasher.hashPassword(newPassword));
+        currentUser.setPasswordHash(PasswordHasher.hashPassword(newPassword));
         userRepository.save();
     }
 }

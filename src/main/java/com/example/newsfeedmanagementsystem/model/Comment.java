@@ -1,5 +1,8 @@
 package com.example.newsfeedmanagementsystem.model;
 
+import com.example.newsfeedmanagementsystem.exception.UnauthorizedActionException;
+import com.example.newsfeedmanagementsystem.util.Session;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,7 +26,13 @@ public class Comment implements Serializable,Commentable {
         return author;
     }
 
-    public void setAuthor(User author) {
+    public void setAuthor(User author) throws UnauthorizedActionException {
+        User currentUser = Session.getCurrentUser();
+
+        if((currentUser == null) || !(currentUser instanceof Admin)) {
+            throw new UnauthorizedActionException("You are not allowed to perform this action");
+        }
+
         this.author = author;
     }
 
@@ -31,16 +40,17 @@ public class Comment implements Serializable,Commentable {
         return content;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void editContent(String newContent) throws UnauthorizedActionException {
+            User currentUser = Session.getCurrentUser();
+            if(!this.author.equals(currentUser)) {
+                throw new UnauthorizedActionException("You are not allowed to perform this action");
+            }
+
+            this.content = newContent;
     }
 
     public Date getTimestamp() {
         return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
     }
 
     public List<Comment> getReplies() {
@@ -48,10 +58,26 @@ public class Comment implements Serializable,Commentable {
     }
 
     @Override
-    public void addComment(Comment comment) {
-        replies.add(comment);
+    public void addComment(Comment comment) throws UnauthorizedActionException{
+        User currentUser = Session.getCurrentUser();
+        if(currentUser == null || !currentUser.equals(comment.getAuthor()))
+            throw new UnauthorizedActionException("You are not allowed to perform this action");
+
+        this.replies.add(comment);
     }
 
+    @Override
+    public void removeComment(Comment comment) throws UnauthorizedActionException {
+        User currentUser = Session.getCurrentUser();
+
+        if(currentUser == null)
+            throw new UnauthorizedActionException("You are not allowed to perform this action");
+
+        if(!comment.getAuthor().equals(currentUser) && !(currentUser instanceof Admin)) {
+            throw new UnauthorizedActionException("Not allowed to delete comment");
+        }
+        replies.remove(comment);
+    }
     @Override
     public String toString() {
         return String.format("%s: \"%s\" (%d replies)", author.getUsername(), content, replies.size());

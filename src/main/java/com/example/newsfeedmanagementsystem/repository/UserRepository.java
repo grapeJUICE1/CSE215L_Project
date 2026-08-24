@@ -21,6 +21,14 @@ public class UserRepository {
         usersByUsername.put(user.getUsername(), user);
     }
 
+    public void removeUser(User oldUser) throws UserNotFoundException {
+        if(usersByUsername.containsKey(oldUser.getUsername())) {
+            usersByUsername.remove(oldUser.getUsername());
+        } else {
+            throw new UserNotFoundException("User not found: " + oldUser.getUsername());
+        }
+    }
+
     public User findUserByUsername(String username) throws UserNotFoundException {
         User user = usersByUsername.get(username);
         if(user == null) {

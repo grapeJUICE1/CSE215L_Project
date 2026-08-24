@@ -1,5 +1,8 @@
 package com.example.newsfeedmanagementsystem.model;
 
+import com.example.newsfeedmanagementsystem.exception.UnauthorizedActionException;
+import com.example.newsfeedmanagementsystem.util.Session;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,6 +15,7 @@ public abstract class Article implements Serializable, Likeable,Commentable{
     private String category;
     private Date publishedAt = new Date();
     private int likes;
+    private int reportCount;
     private static final long serialVersionUID = 1L;
     private List<Comment> comments;
 
@@ -29,40 +33,20 @@ public abstract class Article implements Serializable, Likeable,Commentable{
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getContent() {
             return content;
         }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     public User getAuthor() {
         return author;
-    }
-
-    public void setAuthor(User author) {
-        this.author = author;
     }
 
     public String getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
     public Date getPublishedAt() {
         return publishedAt;
-    }
-
-    public void setPublishedAt(Date publishedAt) {
-        this.publishedAt = publishedAt;
     }
 
     public int getLikes() {
@@ -73,17 +57,60 @@ public abstract class Article implements Serializable, Likeable,Commentable{
         return comments;
     }
 
+    public int getReportCount() {
+       return reportCount;
+    }
+
+    public void report() {
+        this.reportCount++;
+    }
+
     @Override
-    public void addComment(Comment comment) {
+    public void addComment(Comment comment) throws UnauthorizedActionException{
+        User currentUser = Session.getCurrentUser();
+        if(currentUser == null || !currentUser.equals(comment.getAuthor()))
+            throw new UnauthorizedActionException("You are not allowed to perform this action");
+
         this.comments.add(comment);
     }
 
     @Override
-    public void like() {
+    public void removeComment(Comment comment) throws UnauthorizedActionException {
+
+        User currentUser = Session.getCurrentUser();
+        if(currentUser == null)
+            throw new UnauthorizedActionException("You are not allowed to perform this action");
+
+        if(!comment.getAuthor().equals(currentUser) && !(currentUser instanceof Admin)) {
+           throw new UnauthorizedActionException("Not allowed to delete comment");
+        }
+        comments.remove(comment);
+    }
+
+
+    public void update(String newTitle, String newContent , String newCategory) throws UnauthorizedActionException {
+        User currentUser = Session.getCurrentUser();
+        if (!this.author.equals(currentUser)) {
+            throw new UnauthorizedActionException("Only the original author can edit this article");
+        }
+        this.title = newTitle;
+        this.content = newContent;
+        this.category = newCategory;
+    }
+
+    @Override
+    public void like() throws UnauthorizedActionException{
+       User currentUser = Session.getCurrentUser();
+       if(currentUser == null)
+           throw new UnauthorizedActionException("You are not allowed to perform this action");
         this.likes++;
     }
     @Override
-    public void unlike() {
+    public void unlike() throws UnauthorizedActionException {
+        User currentUser = Session.getCurrentUser();
+        if(currentUser == null)
+            throw new UnauthorizedActionException("You are not allowed to perform this action");
+
         if (this.likes > 0 )
             this.likes--;
     }

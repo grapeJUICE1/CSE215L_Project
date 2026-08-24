@@ -1,5 +1,8 @@
 package com.example.newsfeedmanagementsystem.model;
 
+import com.example.newsfeedmanagementsystem.exception.UnauthorizedActionException;
+import com.example.newsfeedmanagementsystem.util.Session;
+
 import java.io.Serializable;
 
 public abstract class User implements Serializable {
@@ -20,15 +23,16 @@ public abstract class User implements Serializable {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getPasswordHash() {
         return passwordHash;
     }
 
-    public void setPasswordHash(String passwordHash) {
+    public void setPasswordHash(String passwordHash) throws UnauthorizedActionException {
+        User currentUser = Session.getCurrentUser();
+
+        if(currentUser == null || !this.equals(currentUser)) {
+            throw new UnauthorizedActionException("You are not allowed to perform this action");
+        }
         this.passwordHash = passwordHash;
     }
 
@@ -36,16 +40,27 @@ public abstract class User implements Serializable {
         return displayName;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
     public boolean isBanned() {
        return isBanned;
     }
 
-    public void setBanned(boolean banned) {
+    public void setBanned(boolean banned) throws UnauthorizedActionException {
+        User currentUser = Session.getCurrentUser();
+
+        if(currentUser == null || !(currentUser instanceof Admin)) {
+            throw new UnauthorizedActionException("You are not allowed to perform this action");
+        }
         isBanned = banned;
+    }
+
+    public void updateUser(String displayName) throws UnauthorizedActionException {
+        User currentUser = Session.getCurrentUser();
+
+        if(currentUser == null || !this.equals(currentUser)) {
+            throw new UnauthorizedActionException("You are not allowed to perform this action");
+        }
+
+        this.displayName = displayName;
     }
 
     @Override
