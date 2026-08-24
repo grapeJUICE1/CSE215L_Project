@@ -30,6 +30,13 @@ public class ArticleRepository {
                 .collect(Collectors.toList());
     }
 
+    public Article findById(String id) {
+        return articles.stream()
+                .filter(a -> a.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
     public void save(){
         try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))){
             oos.writeObject(articles);

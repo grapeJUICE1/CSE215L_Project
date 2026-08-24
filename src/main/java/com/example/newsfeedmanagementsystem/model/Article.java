@@ -18,8 +18,10 @@ public abstract class Article implements Serializable, Likeable,Commentable{
     private int reportCount;
     private static final long serialVersionUID = 1L;
     private List<Comment> comments;
+    private final String id;
 
     public Article(String title, String content, User author, String category) {
+        this.id = java.util.UUID.randomUUID().toString();
         this.title = title;
         this.content = content;
         this.author = author;
@@ -28,6 +30,10 @@ public abstract class Article implements Serializable, Likeable,Commentable{
         this.comments = new ArrayList<>();
     }
     public abstract String render();
+
+    public String getId() {
+        return id;
+    }
 
     public String getTitle() {
         return title;

@@ -5,10 +5,7 @@ import com.example.newsfeedmanagementsystem.model.Article;
 import com.example.newsfeedmanagementsystem.repository.ArticleRepository;
 import com.example.newsfeedmanagementsystem.repository.UserRepository;
 import com.example.newsfeedmanagementsystem.service.FeedService;
-import com.example.newsfeedmanagementsystem.util.AppState;
-import com.example.newsfeedmanagementsystem.util.SceneManager;
-import com.example.newsfeedmanagementsystem.util.Session;
-import com.example.newsfeedmanagementsystem.util.ThemeManager;
+import com.example.newsfeedmanagementsystem.util.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -42,21 +39,13 @@ public class FeedController {
        categoryFilterBox.getItems().addAll(feedService.getAllCategories(articleRepository.getAllArticles()));
        sortModeBox.getItems().addAll("recency", "engagement");
 
-       if(Session.getCurrentUser().canPublish()) {
-           publishButton.setVisible(true);
-           publishButton.setManaged(true);
-       } else {
-           publishButton.setVisible(false);
-           publishButton.setManaged(false);
-       }
+       boolean canPublish = Session.getCurrentUser() != null && Session.getCurrentUser().canPublish();
+           publishButton.setVisible(canPublish);
+           publishButton.setManaged(canPublish);
 
-       if(Session.getCurrentUser() instanceof Admin){
-           adminLink.setVisible(true);
-           adminLink.setManaged(true);
-       }else{
-           adminLink.setVisible(false);
-           adminLink.setManaged(false);
-       }
+       boolean isAdmin = Session.getCurrentUser() != null && Session.getCurrentUser() instanceof Admin;
+           adminLink.setVisible(isAdmin);
+           adminLink.setManaged(isAdmin);
 
        articleListView.setCellFactory(list->new ListCell<Article>(){
            @Override
@@ -126,8 +115,11 @@ public class FeedController {
         refreshFeed();
     }
     @FXML public void onNextPageClicked(){
-        currentPage++;
-        refreshFeed();
+        List<Article> currentView = articleListView.getItems();
+        if(!currentView.isEmpty()) {
+            currentPage++;
+            refreshFeed();
+        }
     }
     @FXML public void onPublishClicked(){
         SceneManager.switchTo("publish");
@@ -140,6 +132,8 @@ public class FeedController {
         SceneManager.switchTo("admin");
     }
     @FXML public void onLogoutClicked(){
+        Session.logout();
+        ToastManager.success("Logged out successfully");
         SceneManager.switchTo("login");
     }
     @FXML public void onArticleClicked(Article article){

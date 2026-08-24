@@ -54,7 +54,8 @@ public class FeedService {
     public List<String> getAllCategories(List<Article> articles) {
         return articles.stream()
                 .map(Article::getCategory)
-                .toList();
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public List<Article> getFeed(List<Article> articles , String searchQuery,String category,String username,String sortMode,int page,int pageSize) {
