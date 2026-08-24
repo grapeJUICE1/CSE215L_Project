@@ -26,7 +26,7 @@ public class ArticleRepository {
 
     public List<Article> getArticlesByUser(User user) {
         return articles.stream()
-                .filter(a->a.getAuthor().equals(user))
+                .filter(a -> a.getAuthor().equals(user))
                 .collect(Collectors.toList());
     }
 
@@ -37,22 +37,22 @@ public class ArticleRepository {
                 .orElse(null);
     }
 
-    public void save(){
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))){
+    public void save() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
             oos.writeObject(articles);
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public void load(){
+    public void load() {
         File file = new File(FILE_PATH);
-        if(!file.exists()) return;
+        if (!file.exists()) return;
 
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))){
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
             articles = (List<Article>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e){
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

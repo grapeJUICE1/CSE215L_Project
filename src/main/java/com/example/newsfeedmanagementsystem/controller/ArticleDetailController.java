@@ -1,9 +1,7 @@
 package com.example.newsfeedmanagementsystem.controller;
 
 import com.example.newsfeedmanagementsystem.exception.UnauthorizedActionException;
-import com.example.newsfeedmanagementsystem.model.Admin;
-import com.example.newsfeedmanagementsystem.model.Article;
-import com.example.newsfeedmanagementsystem.model.Comment;
+import com.example.newsfeedmanagementsystem.model.*;
 import com.example.newsfeedmanagementsystem.repository.ArticleRepository;
 import com.example.newsfeedmanagementsystem.repository.UserRepository;
 import com.example.newsfeedmanagementsystem.service.ModerationService;
@@ -14,24 +12,38 @@ import com.example.newsfeedmanagementsystem.util.ToastManager;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class ArticleDetailController {
 
-    @FXML private Label categoryTag;
-    @FXML private Label titleLabel;
-    @FXML private Label metaLabel;
-    @FXML private Label contentLabel;
-    @FXML private Label likeCountLabel;
-    @FXML private TextArea newCommentField;
-    @FXML private VBox commentsContainer;
-    @FXML private Button editButton;
-    @FXML private Button deleteButton;
+    @FXML
+    private Label categoryTag;
+    @FXML
+    private Label titleLabel;
+    @FXML
+    private Label metaLabel;
+    @FXML
+    private Label contentLabel;
+    @FXML
+    private Label likeCountLabel;
+    @FXML
+    private TextArea newCommentField;
+    @FXML
+    private VBox commentsContainer;
+    @FXML
+    private Button likeButton;
+    @FXML
+    private Button reportButton;
+    @FXML
+    private Button bookmarkButton;
+    @FXML
+    private Button editButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private Button changeTypeButton; // optional
 
     private ArticleRepository articleRepository;
     private UserRepository userRepository;
@@ -47,28 +59,70 @@ public class ArticleDetailController {
         moderationService = new ModerationService(userRepository, articleRepository);
 
         Article clicked = AppState.getSelectedArticle();
-
         if (clicked == null) {
             ToastManager.error("No article selected");
             SceneManager.switchTo("feed");
             return;
         }
         article = articleRepository.findById(clicked.getId());
-        if(article == null) {
+        if (article == null) {
             ToastManager.error("Article not found");
             SceneManager.switchTo("feed");
             return;
         }
 
-        boolean isAuthor = Session.getCurrentUser() != null && Session.getCurrentUser().equals(article.getAuthor());
+        // Permissions
+        User current = Session.getCurrentUser();
+        boolean isAuthor = current != null && current.equals(article.getAuthor());
+        boolean isAdmin = current instanceof Admin;
+
         editButton.setVisible(isAuthor);
         editButton.setManaged(isAuthor);
 
-        boolean isAdmin = Session.getCurrentUser() instanceof Admin;
-        deleteButton.setVisible(isAdmin);
-        deleteButton.setManaged(isAdmin);
+        deleteButton.setVisible(isAuthor || isAdmin);
+        deleteButton.setManaged(isAuthor || isAdmin);
+
+        changeTypeButton.setVisible(isAdmin);
+        changeTypeButton.setManaged(isAdmin);
+        changeTypeButton.setOnAction(e -> onChangeTypeClicked());
+
+        updateLikeButton();
+        updateReportButton();
+        updateBookmarkButton();
 
         renderArticle();
+    }
+
+    private void updateLikeButton() {
+        if (Session.getCurrentUser() == null) {
+            likeButton.setText("🤍 Like");
+            likeButton.setDisable(true);
+            return;
+        }
+        boolean liked = article.isLikedByCurrentUser();
+        likeButton.setText(liked ? "❤️ Unlike" : "🤍 Like");
+        likeButton.setDisable(false);
+    }
+
+    private void updateReportButton() {
+        if (Session.getCurrentUser() == null) {
+            reportButton.setDisable(true);
+            reportButton.setText("Report");
+            return;
+        }
+        boolean reported = article.isReportedByCurrentUser();
+        reportButton.setText(reported ? "Reported" : "Report");
+        reportButton.setDisable(reported);
+    }
+
+    private void updateBookmarkButton() {
+        if (Session.getCurrentUser() == null) {
+            bookmarkButton.setDisable(true);
+            bookmarkButton.setText("☆ Bookmark");
+            return;
+        }
+        boolean bookmarked = Session.getCurrentUser().isBookmarked(article.getId());
+        bookmarkButton.setText(bookmarked ? "★ Unbookmark" : "☆ Bookmark");
     }
 
     private void renderArticle() {
@@ -85,11 +139,9 @@ public class ArticleDetailController {
             SceneManager.switchTo("profile");
         });
 
-        Label timestampLabel = new Label(" • " + article.getPublishedAt());
+        Label timestampLabel = new Label(" • " + article.getPublishedAt().toString()); // use formatter later
         timestampLabel.getStyleClass().add("article-meta");
-
         metaContainer.getChildren().addAll(authorLabel, timestampLabel);
-
 
         contentLabel.setText(article.getContent());
         likeCountLabel.setText(article.getLikes() + " likes");
@@ -99,11 +151,11 @@ public class ArticleDetailController {
     private void renderComments() {
         commentsContainer.getChildren().clear();
         for (Comment comment : article.getComments()) {
-            commentsContainer.getChildren().add(buildCommentNode(comment, 0));
+            commentsContainer.getChildren().add(buildCommentNode(comment, 0, null));
         }
     }
 
-    private VBox buildCommentNode(Comment comment, int depth) {
+    private VBox buildCommentNode(Comment comment, int depth, Comment parent) {
         VBox box = new VBox(6);
         box.getStyleClass().add("card");
         box.setPadding(new Insets(10, 10, 10, 10 + depth * 24));
@@ -119,25 +171,81 @@ public class ArticleDetailController {
         content.getStyleClass().add("article-body");
         content.setWrapText(true);
 
-        Label meta = new Label(comment.getTimestamp().toString());
+        Label meta = new Label(comment.getTimestamp().toString()); // format later
         meta.getStyleClass().add("article-meta");
 
         Button replyButton = new Button("Reply");
         replyButton.getStyleClass().add("nav-link");
         replyButton.setOnAction(e -> onReplyClicked(comment));
 
-        HBox actions = new HBox(10, replyButton);
+        Button deleteButton = new Button("✕");
+        deleteButton.getStyleClass().add("button-danger");
+        User current = Session.getCurrentUser();
+        boolean canDelete = current != null && (current.equals(comment.getAuthor()) || current instanceof Admin);
+        deleteButton.setVisible(canDelete);
+        deleteButton.setManaged(canDelete);
+        deleteButton.setOnAction(e -> {
+            try {
+                if (parent == null) {
+                    article.removeComment(comment);
+                } else {
+                    parent.removeComment(comment);
+                }
+                articleRepository.save();
+                renderArticle();
+                ToastManager.success("Comment deleted");
+            } catch (UnauthorizedActionException ex) {
+                ToastManager.error(ex.getMessage());
+            }
+        });
 
+        HBox actions = new HBox(10, replyButton, deleteButton);
         box.getChildren().addAll(author, content, meta, actions);
 
         for (Comment reply : comment.getReplies()) {
-            box.getChildren().add(buildCommentNode(reply, depth + 1));
+            box.getChildren().add(buildCommentNode(reply, depth + 1, comment));
         }
-
         return box;
     }
 
-    private void onReplyClicked(Comment parentComment) {
+    @FXML
+    public void onLikeClicked() {
+        try {
+            boolean nowLiked = article.toggleLike();
+            articleRepository.save();
+            updateLikeButton();
+            likeCountLabel.setText(article.getLikes() + " likes");
+            ToastManager.success(nowLiked ? "Liked!" : "Unliked");
+        } catch (UnauthorizedActionException e) {
+            ToastManager.error(e.getMessage());
+        }
+    }
+
+    @FXML
+    public void onReportClicked() {
+        if (article.report()) {
+            articleRepository.save();
+            updateReportButton();
+            ToastManager.success("Article reported. Thank you.");
+        } else {
+            ToastManager.info("You already reported this article.");
+        }
+    }
+
+    @FXML
+    public void onBookmarkClicked() {
+        try {
+            Session.getCurrentUser().toggleBookmark(article.getId());
+        } catch (UnauthorizedActionException e) {
+            ToastManager.error(e.getMessage());
+        }
+        userRepository.save(); // persist bookmarks
+        updateBookmarkButton();
+        ToastManager.success(Session.getCurrentUser().isBookmarked(article.getId()) ? "Bookmarked" : "Unbookmarked");
+    }
+
+    @FXML
+    public void onReplyClicked(Comment parentComment) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setHeaderText("Reply to " + parentComment.getAuthor().getDisplayName());
         dialog.setContentText("Your reply:");
@@ -156,18 +264,6 @@ public class ArticleDetailController {
                 ToastManager.error(e.getMessage());
             }
         });
-    }
-
-    @FXML
-    public void onLikeClicked() {
-        try {
-            article.like();
-            articleRepository.save();
-            renderArticle();
-            ToastManager.success("Liked!");
-        } catch (UnauthorizedActionException e) {
-            ToastManager.error(e.getMessage());
-        }
     }
 
     @FXML
@@ -221,6 +317,7 @@ public class ArticleDetailController {
 
     @FXML
     public void onDeleteClicked() {
+        // Optional: add confirmation dialog (we'll add later)
         try {
             moderationService.deleteArticle(article);
             ToastManager.success("Article deleted");
@@ -231,14 +328,21 @@ public class ArticleDetailController {
     }
 
     @FXML
-    public void onReportClicked() {
-        article.report();
+    public void onChangeTypeClicked() {
+        String currentType = article.getTypeName();
+        String newType = currentType.equals("Breaking News") ? "Editorial" : "Breaking News";
+        Article newArticle = article.convertToType(newType);
+        articleRepository.deleteArticle(article);
+        articleRepository.addArticle(newArticle);
         articleRepository.save();
-        ToastManager.success("Article reported. Thank you.");
+        article = newArticle;
+        renderArticle();
+        ToastManager.success("Article type changed to " + newType);
     }
 
     @FXML
     public void onBackClicked() {
+        AppState.setSelectedArticle(null);
         SceneManager.switchTo("feed");
     }
 }

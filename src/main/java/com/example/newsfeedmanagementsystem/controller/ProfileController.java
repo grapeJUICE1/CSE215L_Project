@@ -3,10 +3,7 @@ package com.example.newsfeedmanagementsystem.controller;
 import com.example.newsfeedmanagementsystem.exception.InvalidCredentialsException;
 import com.example.newsfeedmanagementsystem.exception.UnauthorizedActionException;
 import com.example.newsfeedmanagementsystem.exception.UserNotFoundException;
-import com.example.newsfeedmanagementsystem.model.Admin;
-import com.example.newsfeedmanagementsystem.model.Article;
-import com.example.newsfeedmanagementsystem.model.Journalist;
-import com.example.newsfeedmanagementsystem.model.User;
+import com.example.newsfeedmanagementsystem.model.*;
 import com.example.newsfeedmanagementsystem.repository.ArticleRepository;
 import com.example.newsfeedmanagementsystem.repository.UserRepository;
 import com.example.newsfeedmanagementsystem.service.AuthService;
@@ -19,28 +16,39 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ProfileController {
 
-    @FXML private Label headerLabel;
-    @FXML private Label displayNameLabel;
-    @FXML private Label usernameLabel;
-    @FXML private Label roleTag;
-    @FXML private Label statusLabel;
-
-    @FXML private VBox settingsContainer;
-    @FXML private TextField editDisplayNameField;
-    @FXML private PasswordField oldPasswordField;
-    @FXML private PasswordField newPasswordField;
-
-    @FXML private VBox articlesContainer; // Wrap ListView and Header in a VBox in profile.fxml if needed, or toggle both
-    @FXML private Label articlesHeaderLabel;
-    @FXML private ListView<Article> userArticlesListView;
+    @FXML
+    private Label headerLabel;
+    @FXML
+    private Label displayNameLabel;
+    @FXML
+    private Label usernameLabel;
+    @FXML
+    private Label roleTag;
+    @FXML
+    private Label statusLabel;
+    @FXML
+    private VBox settingsContainer;
+    @FXML
+    private TextField editDisplayNameField;
+    @FXML
+    private PasswordField oldPasswordField;
+    @FXML
+    private PasswordField newPasswordField;
+    @FXML
+    private ListView<Article> userArticlesListView;
+    @FXML
+    private ListView<Article> bookmarksListView; // NEW
+    @FXML
+    private TabPane profileTabPane;
 
     private UserRepository userRepository;
     private ArticleRepository articleRepository;
     private AuthService authService;
-
     private User targetUser;
     private boolean isSelfProfile;
 
@@ -55,17 +63,16 @@ public class ProfileController {
         User clicked = AppState.getViewedProfileUser();
         User currentUser = Session.getCurrentUser();
 
-        if(clicked != null) {
+        if (clicked != null) {
             try {
                 targetUser = userRepository.findUserByUsername(clicked.getUsername());
             } catch (UserNotFoundException e) {
                 ToastManager.error(e.getMessage());
             }
-
         }
 
-        if (targetUser  != null) {
-            isSelfProfile = currentUser != null && currentUser.equals(clicked );
+        if (targetUser != null) {
+            isSelfProfile = currentUser != null && currentUser.equals(clicked);
         } else if (currentUser != null) {
             targetUser = currentUser;
             isSelfProfile = true;
@@ -77,10 +84,7 @@ public class ProfileController {
 
         setupUI();
         loadUserArticles();
-    }
-
-    private boolean isPublishingRole(User user) {
-        return user instanceof Journalist || user instanceof Admin;
+        setupBookmarksTab();
     }
 
     private void setupUI() {
@@ -99,17 +103,13 @@ public class ProfileController {
             settingsContainer.setVisible(true);
             settingsContainer.setManaged(true);
             editDisplayNameField.setText(targetUser.getDisplayName());
-            articlesHeaderLabel.setText("Your Articles");
         } else {
             headerLabel.setText(targetUser.getDisplayName() + "'s Profile");
             settingsContainer.setVisible(false);
             settingsContainer.setManaged(false);
-            articlesHeaderLabel.setText("Articles by " + targetUser.getDisplayName());
         }
 
-        boolean canPublish = isPublishingRole(targetUser);
-        articlesHeaderLabel.setVisible(canPublish);
-        articlesHeaderLabel.setManaged(canPublish);
+        boolean canPublish = targetUser.canPublish();
         userArticlesListView.setVisible(canPublish);
         userArticlesListView.setManaged(canPublish);
 
@@ -119,41 +119,84 @@ public class ProfileController {
                 protected void updateItem(Article article, boolean empty) {
                     super.updateItem(article, empty);
                     if (empty || article == null) {
-                        setText(null);
                         setGraphic(null);
-                    } else {
-                        VBox card = new VBox(6);
-                        card.getStyleClass().add("card");
-
-                        Label title = new Label(article.getTitle());
-                        title.getStyleClass().add("article-title");
-
-                        Label tag = new Label(article.getCategory());
-                        tag.getStyleClass().add("tag-chip");
-
-                        Label meta = new Label(article.getLikes() + " likes • " + article.getComments().size() + " comments • " + article.getPublishedAt());
-                        meta.getStyleClass().add("article-meta");
-
-                        card.getChildren().addAll(title, tag, meta);
-                        card.setOnMouseClicked(e -> {
-                            AppState.setSelectedArticle(article);
-                            AppState.setViewedProfileUser(null);
-                            SceneManager.switchTo("article-detail");
-                        });
-
-                        setGraphic(card);
                         setText(null);
+                    } else {
+                        VBox card = buildArticleCard(article);
+                        setGraphic(card);
                     }
                 }
             });
         }
     }
 
+    private VBox buildArticleCard(Article article) {
+        VBox card = new VBox(6);
+        card.getStyleClass().add("card");
+
+        Label title = new Label(article.getTitle());
+        title.getStyleClass().add("article-title");
+
+        Label tag = new Label(article.getCategory());
+        tag.getStyleClass().add("tag-chip");
+
+        Label meta = new Label(article.getLikes() + " likes • " + article.getComments().size() + " comments • " + article.getPublishedAt());
+        meta.getStyleClass().add("article-meta");
+
+        card.getChildren().addAll(title, tag, meta);
+        card.setOnMouseClicked(e -> {
+            AppState.setSelectedArticle(article);
+            AppState.setViewedProfileUser(null);
+            SceneManager.switchTo("article-detail");
+        });
+        return card;
+    }
+
     private void loadUserArticles() {
-        if (isPublishingRole(targetUser)) {
+        if (targetUser.canPublish()) {
             List<Article> userArticles = articleRepository.getArticlesByUser(targetUser);
-            userArticlesListView.getItems().clear();
-            userArticlesListView.getItems().addAll(userArticles);
+            userArticlesListView.getItems().setAll(userArticles);
+        }
+    }
+
+    private void setupBookmarksTab() {
+        if (isSelfProfile) {
+            loadUserArticles();
+            bookmarksListView.setCellFactory(list -> new ListCell<Article>() {
+                @Override
+                protected void updateItem(Article article, boolean empty) {
+                    super.updateItem(article, empty);
+                    if (empty || article == null) {
+                        setGraphic(null);
+                        setText(null);
+                    } else {
+                        VBox card = buildArticleCard(article);
+                        setGraphic(card);
+                    }
+                }
+            });
+            loadBookmarks();
+
+            profileTabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+                if (newTab.getText().equals("Bookmarks")) {
+                    loadBookmarks();
+                }
+            });
+        } else {
+            profileTabPane.getTabs().removeIf(tab -> tab.getText().equals("Bookmarks"));
+        }
+    }
+
+    private void loadBookmarks() {
+        if (Session.getCurrentUser() == null) return;
+        try {
+            Set<String> ids = Session.getCurrentUser().getBookmarkIds();
+            List<Article> bookmarked = articleRepository.getAllArticles().stream()
+                    .filter(a -> ids.contains(a.getId()))
+                    .collect(Collectors.toList());
+            bookmarksListView.getItems().setAll(bookmarked);
+        } catch (UnauthorizedActionException e) {
+            ToastManager.error(e.getMessage());
         }
     }
 
@@ -164,7 +207,6 @@ public class ProfileController {
             ToastManager.error("Display name cannot be empty");
             return;
         }
-
         try {
             targetUser.updateUser(newName);
             userRepository.save();
@@ -179,12 +221,10 @@ public class ProfileController {
     public void onChangePasswordClicked() {
         String oldPass = oldPasswordField.getText();
         String newPass = newPasswordField.getText();
-
         if (oldPass.isBlank() || newPass.isBlank()) {
             ToastManager.error("Please fill in both password fields");
             return;
         }
-
         try {
             authService.changePassword(oldPass, newPass);
             oldPasswordField.clear();

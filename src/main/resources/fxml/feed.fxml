@@ -19,7 +19,6 @@
             styleClass="root-pane"
             prefWidth="1000" prefHeight="700">
 
-    <!-- ===== TOP NAV ===== -->
     <top>
         <VBox>
             <HBox alignment="CENTER_LEFT" spacing="16" styleClass="top-nav">
@@ -33,6 +32,9 @@
 
                 <ComboBox fx:id="sortModeBox" promptText="Sort by" styleClass="input-field"
                           onAction="#onSortChanged"/>
+
+                <ComboBox fx:id="typeFilterBox" promptText="Type" styleClass="input-field"
+                          onAction="#onFilterChanged"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
 
@@ -49,17 +51,17 @@
         </VBox>
     </top>
 
-    <!-- ===== ARTICLE LIST ===== -->
     <center>
         <VBox spacing="0">
             <ListView fx:id="articleListView" styleClass="list-view" VBox.vgrow="ALWAYS"/>
         </VBox>
     </center>
 
-    <!-- ===== PAGINATION ===== -->
     <bottom>
         <HBox alignment="CENTER" spacing="16">
-            <padding><Insets top="14" right="0" bottom="18" left="0"/></padding>
+            <padding>
+                <Insets top="14" right="0" bottom="18" left="0"/>
+            </padding>
             <Button fx:id="prevPageButton" text="← Prev" styleClass="nav-link" onAction="#onPrevPageClicked"/>
             <Label fx:id="pageLabel" text="Page 1" styleClass="article-meta"/>
             <Button fx:id="nextPageButton" text="Next →" styleClass="nav-link" onAction="#onNextPageClicked"/>

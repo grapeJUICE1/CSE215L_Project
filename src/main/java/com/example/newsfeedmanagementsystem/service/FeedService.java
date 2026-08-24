@@ -27,6 +27,12 @@ public class FeedService {
                 .collect(Collectors.toList());
     }
 
+    private List<Article> filterByType(String type, List<Article> articles) {
+        return articles.stream()
+                .filter(a -> a.getTypeName().equals(type))
+                .collect(Collectors.toList());
+    }
+
     private List<Article> sortByRecency(List<Article> articles) {
         List<Article> articlesCopy = new ArrayList<>(articles);
         articlesCopy.sort(Comparator.comparing(Article::getPublishedAt).reversed());
@@ -45,12 +51,13 @@ public class FeedService {
     }
 
     private List<Article> paginate(List<Article> articles, int pageNumber, int pageSize) {
-        int fromIndex = pageNumber  * pageSize;
-        if(fromIndex > articles.size())
+        int fromIndex = pageNumber * pageSize;
+        if (fromIndex > articles.size())
             return Collections.emptyList();
-        int toIndex = Math.min(fromIndex + pageSize,articles.size());
+        int toIndex = Math.min(fromIndex + pageSize, articles.size());
         return articles.subList(fromIndex, toIndex);
     }
+
     public List<String> getAllCategories(List<Article> articles) {
         return articles.stream()
                 .map(Article::getCategory)
@@ -58,18 +65,20 @@ public class FeedService {
                 .collect(Collectors.toList());
     }
 
-    public List<Article> getFeed(List<Article> articles , String searchQuery,String category,String username,String sortMode,int page,int pageSize) {
-        if(searchQuery != null && !searchQuery.isEmpty())
-            articles = searchArticles(searchQuery,articles);
-        if(category != null && !category.isEmpty())
-            articles = filterByCategory(category,articles);
-        if(username != null && !username.isEmpty())
-            articles = filterByAuthor(username,articles);
-        if(sortMode != null && sortMode.equals("recency"))
+    public List<Article> getFeed(List<Article> articles, String searchQuery, String category,
+                                 String username, String sortMode, int page, int pageSize, String type) {
+        if (searchQuery != null && !searchQuery.isEmpty())
+            articles = searchArticles(searchQuery, articles);
+        if (category != null && !category.isEmpty())
+            articles = filterByCategory(category, articles);
+        if (username != null && !username.isEmpty())
+            articles = filterByAuthor(username, articles);
+        if (type != null && !type.isEmpty() && !type.equals("All"))
+            articles = filterByType(type, articles);
+        if (sortMode != null && sortMode.equals("recency"))
             articles = sortByRecency(articles);
-        if(sortMode != null && sortMode.equals("engagement"))
+        if (sortMode != null && sortMode.equals("engagement"))
             articles = sortByEngagement(articles);
-
-        return paginate(articles,page,pageSize);
+        return paginate(articles, page, pageSize);
     }
 }

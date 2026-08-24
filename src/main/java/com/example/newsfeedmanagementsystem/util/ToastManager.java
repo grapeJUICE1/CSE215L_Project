@@ -13,7 +13,7 @@ import javafx.util.Duration;
 
 public class ToastManager {
 
-    private enum Type { SUCCESS, ERROR, INFO }
+    private enum Type {SUCCESS, ERROR, INFO}
 
     private static Popup loadingPopup;
 
@@ -77,10 +77,13 @@ public class ToastManager {
 
     private static String colorFor(Type type) {
         switch (type) {
-            case SUCCESS: return "#2ea043"; // green
-            case ERROR:   return "#e5484d"; // red
+            case SUCCESS:
+                return "#2ea043"; // green
+            case ERROR:
+                return "#e5484d"; // red
             case INFO:
-            default:      return "#4f9de8"; // blue
+            default:
+                return "#4f9de8"; // blue
         }
     }
 

@@ -11,7 +11,6 @@ import com.example.newsfeedmanagementsystem.util.Session;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 public class ModerationService {
     UserRepository userRepository;
     ArticleRepository articleRepository;
@@ -21,57 +20,53 @@ public class ModerationService {
         this.articleRepository = articleRepository;
     }
 
-    public void deleteArticle( Article article) throws UnauthorizedActionException {
-        User currentUser = Session.getCurrentUser();
+    private void verifyAdmin() throws UnauthorizedActionException {
+        User current = Session.getCurrentUser();
+        if (!(current instanceof Admin)) {
+            throw new UnauthorizedActionException("Only administrators can perform this action.");
+        }
+    }
 
-        if(!(currentUser instanceof Admin))
-            throw new UnauthorizedActionException("You are not allowed to perform this action");
-
+    public void deleteArticle(Article article) throws UnauthorizedActionException {
+        User current = Session.getCurrentUser();
+        if (current == null) throw new UnauthorizedActionException("Not logged in");
+        boolean isAdmin = current instanceof Admin;
+        boolean isAuthor = current.equals(article.getAuthor());
+        if (!isAdmin && !isAuthor) {
+            throw new UnauthorizedActionException("Only the author or an admin can delete this article.");
+        }
         articleRepository.deleteArticle(article);
         articleRepository.save();
     }
 
-    public void promoteToJournalist(RegularUser user) throws UnauthorizedActionException, UserNotFoundException, DuplicateUserException {
-        User currentUser = Session.getCurrentUser();
-
-        if(!(currentUser instanceof Admin))
-            throw new UnauthorizedActionException("You are not allowed to perform this action");
-
-        Journalist newJournalist = new Journalist(user.getUsername(),user.getPasswordHash(),user.getDisplayName());
+    public void promoteToJournalist(String username) throws UnauthorizedActionException, UserNotFoundException, DuplicateUserException {
+        verifyAdmin();
+        User user = userRepository.findUserByUsername(username);
+        if (user instanceof Journalist || user instanceof Admin) {
+            throw new UnauthorizedActionException("User is already a Journalist or Admin.");
+        }
+        Journalist newJournalist = new Journalist(user.getUsername(), user.getPasswordHash(), user.getDisplayName());
+        if (user.isBanned()) {
+            newJournalist.setBanned(true);
+        }
         userRepository.removeUser(user);
         userRepository.addUser(newJournalist);
         userRepository.save();
     }
 
-    public void banUser(User user) throws UnauthorizedActionException{
-        User currentUser = Session.getCurrentUser();
-
-        if(!(currentUser instanceof Admin))
-            throw new UnauthorizedActionException("You are not allowed to perform this action");
-
-       user.setBanned(true);
-       userRepository.save();
-    }
-
-    public void unbanUser(User user) throws UnauthorizedActionException {
-        User currentUser = Session.getCurrentUser();
-
-        if(!(currentUser instanceof Admin))
-            throw new UnauthorizedActionException("You are not allowed to perform this action");
-
-        user.setBanned(false);
+    public void toggleBanStatus(String username) throws UnauthorizedActionException, UserNotFoundException {
+        verifyAdmin();
+        User user = userRepository.findUserByUsername(username);
+        if (user instanceof Admin)
+            throw new UnauthorizedActionException("Cannot ban another administrator.");
+        user.setBanned(!user.isBanned());
         userRepository.save();
     }
 
     public List<Article> getReportedArticles() throws UnauthorizedActionException {
-        User currentUser = Session.getCurrentUser();
-
-        if(!(currentUser instanceof Admin))
-            throw new UnauthorizedActionException("You are not allowed to perform this action");
-
+        verifyAdmin();
         return articleRepository.getAllArticles().stream()
-                .filter( article -> article.getReportCount() > 0)
-                .collect(Collectors.toList()) ;
+                .filter(article -> article.getReportCount() > 0)
+                .collect(Collectors.toList());
     }
-
 }

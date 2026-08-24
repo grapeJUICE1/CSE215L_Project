@@ -4,5 +4,6 @@ import com.example.newsfeedmanagementsystem.exception.UnauthorizedActionExceptio
 
 public interface Commentable {
     void addComment(Comment comment) throws UnauthorizedActionException;
-    void removeComment(Comment comment)throws UnauthorizedActionException;
+
+    void removeComment(Comment comment) throws UnauthorizedActionException;
 }

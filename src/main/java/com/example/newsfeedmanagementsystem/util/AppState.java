@@ -14,6 +14,7 @@ public class AppState {
     public static void setViewedProfileUser(User viewedProfileUser) {
         AppState.viewedProfileUser = viewedProfileUser;
     }
+
     public static Article getSelectedArticle() {
         return selectedArticle;
     }

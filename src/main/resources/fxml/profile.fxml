@@ -12,6 +12,8 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.Tab?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.newsfeedmanagementsystem.controller.ProfileController"
@@ -27,14 +29,13 @@
         </HBox>
     </top>
 
-    <!-- MAIN CONTENT AREA -->
     <center>
         <HBox alignment="TOP_CENTER" spacing="24">
-            <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+            <padding>
+                <Insets top="24" right="24" bottom="24" left="24"/>
+            </padding>
 
-            <!-- LEFT: USER CARD & SETTINGS -->
             <VBox spacing="16" prefWidth="360" maxWidth="400">
-                <!-- User Info Box -->
                 <VBox spacing="10" styleClass="card">
                     <Label fx:id="displayNameLabel" styleClass="brand-title"/>
                     <Label fx:id="usernameLabel" styleClass="article-meta"/>
@@ -42,11 +43,9 @@
                     <Label fx:id="statusLabel" styleClass="error-label" visible="false" managed="false"/>
                 </VBox>
 
-                <!-- Profile Management Settings (Hidden in Inspection Mode) -->
                 <VBox fx:id="settingsContainer" spacing="14" styleClass="card">
                     <Label text="Account Settings" styleClass="field-label"/>
 
-                    <!-- Update Display Name -->
                     <VBox spacing="6">
                         <Label text="Display Name" styleClass="field-label"/>
                         <HBox spacing="8">
@@ -63,17 +62,31 @@
                         <Label text="New Password" styleClass="field-label"/>
                         <PasswordField fx:id="newPasswordField" styleClass="input-field"/>
 
-                        <Button text="Change Password" styleClass="primary-btn" maxWidth="Infinity" onAction="#onChangePasswordClicked">
-                            <VBox.margin><Insets top="6"/></VBox.margin>
+                        <Button text="Change Password" styleClass="primary-btn" maxWidth="Infinity"
+                                onAction="#onChangePasswordClicked">
+                            <VBox.margin>
+                                <Insets top="6"/>
+                            </VBox.margin>
                         </Button>
                     </VBox>
                 </VBox>
             </VBox>
 
-            <!-- RIGHT: USER'S PUBLISHED ARTICLES -->
             <VBox spacing="12" HBox.hgrow="ALWAYS" maxWidth="580">
-                <Label fx:id="articlesHeaderLabel" text="Published Articles" styleClass="field-label"/>
-                <ListView fx:id="userArticlesListView" styleClass="list-view" VBox.vgrow="ALWAYS"/>
+                <TabPane fx:id="profileTabPane"  tabClosingPolicy="UNAVAILABLE">
+                    <Tab text="Published Articles">
+                        <VBox spacing="12">
+                            <padding><Insets top="12" right="8" bottom="8" left="8"/></padding>
+                            <ListView fx:id="userArticlesListView" styleClass="list-view" VBox.vgrow="ALWAYS"/>
+                        </VBox>
+                    </Tab>
+                    <Tab text="Bookmarks">
+                        <VBox spacing="12">
+                            <padding><Insets top="12" right="8" bottom="8" left="8"/></padding>
+                            <ListView fx:id="bookmarksListView" styleClass="list-view" VBox.vgrow="ALWAYS"/>
+                        </VBox>
+                    </Tab>
+                </TabPane>
             </VBox>
         </HBox>
     </center>

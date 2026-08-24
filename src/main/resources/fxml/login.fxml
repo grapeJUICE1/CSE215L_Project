@@ -19,17 +19,23 @@
            prefWidth="900" prefHeight="600">
 
     <HBox alignment="TOP_RIGHT" StackPane.alignment="TOP_RIGHT">
-        <padding><Insets top="16" right="16" bottom="0" left="0"/></padding>
+        <padding>
+            <Insets top="16" right="16" bottom="0" left="0"/>
+        </padding>
         <ToggleButton fx:id="darkModeToggle" text="🌙" styleClass="theme-toggle-btn"
                       onAction="#onDarkModeToggleClicked"/>
     </HBox>
 
     <VBox alignment="CENTER" spacing="0" maxWidth="380" maxHeight="520" styleClass="auth-card">
-        <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+        <padding>
+            <Insets top="40" right="40" bottom="40" left="40"/>
+        </padding>
 
         <Label text="NewsFeed" styleClass="brand-title"/>
         <Label text="Stay informed. Stay connected." styleClass="brand-subtitle">
-            <VBox.margin><Insets bottom="28"/></VBox.margin>
+            <VBox.margin>
+                <Insets bottom="28"/>
+            </VBox.margin>
         </Label>
 
         <VBox spacing="6">
@@ -38,31 +44,41 @@
         </VBox>
 
         <VBox spacing="6" fx:id="displayNameContainer" managed="false" visible="false">
-            <VBox.margin><Insets top="14"/></VBox.margin>
+            <VBox.margin>
+                <Insets top="14"/>
+            </VBox.margin>
             <Label text="Display Name" styleClass="field-label"/>
             <TextField fx:id="displayNameField" promptText="Enter your display name" styleClass="input-field"/>
         </VBox>
 
         <VBox spacing="6">
-            <VBox.margin><Insets top="14"/></VBox.margin>
+            <VBox.margin>
+                <Insets top="14"/>
+            </VBox.margin>
             <Label text="Password" styleClass="field-label"/>
             <PasswordField fx:id="passwordField" promptText="Enter your password" styleClass="input-field"/>
         </VBox>
 
         <VBox spacing="6" fx:id="roleContainer" managed="false" visible="false">
-            <VBox.margin><Insets top="14"/></VBox.margin>
+            <VBox.margin>
+                <Insets top="14"/>
+            </VBox.margin>
             <Label text="Account Type" styleClass="field-label"/>
             <ComboBox fx:id="roleComboBox" maxWidth="Infinity" styleClass="input-field"/>
         </VBox>
 
         <Button fx:id="submitButton" text="Login" styleClass="primary-btn" maxWidth="Infinity"
                 onAction="#onSubmitClicked">
-            <VBox.margin><Insets top="24"/></VBox.margin>
+            <VBox.margin>
+                <Insets top="24"/>
+            </VBox.margin>
         </Button>
 
         <Hyperlink fx:id="toggleModeLink" text="Don't have an account? Register" styleClass="toggle-link"
                    onAction="#onToggleModeClicked">
-            <VBox.margin><Insets top="12"/></VBox.margin>
+            <VBox.margin>
+                <Insets top="12"/>
+            </VBox.margin>
         </Hyperlink>
     </VBox>
 </StackPane>

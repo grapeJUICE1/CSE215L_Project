@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Comment implements Serializable,Commentable {
+public class Comment implements Serializable, Commentable {
     private User author;
     private String content;
     private Date timestamp = new Date();
@@ -29,7 +29,7 @@ public class Comment implements Serializable,Commentable {
     public void setAuthor(User author) throws UnauthorizedActionException {
         User currentUser = Session.getCurrentUser();
 
-        if((currentUser == null) || !(currentUser instanceof Admin)) {
+        if ((currentUser == null) || !(currentUser instanceof Admin)) {
             throw new UnauthorizedActionException("You are not allowed to perform this action");
         }
 
@@ -41,12 +41,12 @@ public class Comment implements Serializable,Commentable {
     }
 
     public void editContent(String newContent) throws UnauthorizedActionException {
-            User currentUser = Session.getCurrentUser();
-            if(!this.author.equals(currentUser)) {
-                throw new UnauthorizedActionException("You are not allowed to perform this action");
-            }
+        User currentUser = Session.getCurrentUser();
+        if (!this.author.equals(currentUser)) {
+            throw new UnauthorizedActionException("You are not allowed to perform this action");
+        }
 
-            this.content = newContent;
+        this.content = newContent;
     }
 
     public Date getTimestamp() {
@@ -58,9 +58,9 @@ public class Comment implements Serializable,Commentable {
     }
 
     @Override
-    public void addComment(Comment comment) throws UnauthorizedActionException{
+    public void addComment(Comment comment) throws UnauthorizedActionException {
         User currentUser = Session.getCurrentUser();
-        if(currentUser == null || !currentUser.equals(comment.getAuthor()))
+        if (currentUser == null || !currentUser.equals(comment.getAuthor()))
             throw new UnauthorizedActionException("You are not allowed to perform this action");
 
         this.replies.add(comment);
@@ -70,14 +70,15 @@ public class Comment implements Serializable,Commentable {
     public void removeComment(Comment comment) throws UnauthorizedActionException {
         User currentUser = Session.getCurrentUser();
 
-        if(currentUser == null)
+        if (currentUser == null)
             throw new UnauthorizedActionException("You are not allowed to perform this action");
 
-        if(!comment.getAuthor().equals(currentUser) && !(currentUser instanceof Admin)) {
+        if (!comment.getAuthor().equals(currentUser) && !(currentUser instanceof Admin)) {
             throw new UnauthorizedActionException("Not allowed to delete comment");
         }
         replies.remove(comment);
     }
+
     @Override
     public String toString() {
         return String.format("%s: \"%s\" (%d replies)", author.getUsername(), content, replies.size());

@@ -46,24 +46,23 @@ public class AuthService {
         return newUser;
     }
 
-    public User login(String username, String password) throws UserNotFoundException, InvalidCredentialsException,UnauthorizedActionException
-    {
+    public User login(String username, String password) throws UserNotFoundException, InvalidCredentialsException, UnauthorizedActionException {
         User user = userRepository.findUserByUsername(username);
-        if(user.isBanned()){
+        if (user.isBanned()) {
             throw new UnauthorizedActionException("User is banned");
         }
         boolean valid = PasswordHasher.checkPassword(password, user.getPasswordHash());
-        if(!valid)
+        if (!valid)
             throw new InvalidCredentialsException("Invalid username or password");
 
         Session.login(user);
         return user;
     }
 
-    public void changePassword(String oldPassword,String newPassword) throws  InvalidCredentialsException, UnauthorizedActionException {
+    public void changePassword(String oldPassword, String newPassword) throws InvalidCredentialsException, UnauthorizedActionException {
         User currentUser = Session.getCurrentUser();
         boolean valid = PasswordHasher.checkPassword(oldPassword, currentUser.getPasswordHash());
-        if(!valid)
+        if (!valid)
             throw new InvalidCredentialsException("Invalid username or password");
 
         String newHash = PasswordHasher.hashPassword(newPassword);
@@ -74,5 +73,6 @@ public class AuthService {
         } catch (UserNotFoundException e) {
         }
 
-        userRepository.save();    }
+        userRepository.save();
+    }
 }

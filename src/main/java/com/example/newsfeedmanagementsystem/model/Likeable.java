@@ -2,7 +2,17 @@ package com.example.newsfeedmanagementsystem.model;
 
 import com.example.newsfeedmanagementsystem.exception.UnauthorizedActionException;
 
+import java.util.Set;
+
 public interface Likeable {
-    public void like() throws UnauthorizedActionException;
-    public void unlike() throws UnauthorizedActionException;
+
+    private Set<String> getLikedBy() {
+        return null;
+    }
+
+    public boolean toggleLike() throws UnauthorizedActionException;
+
+    public boolean isLikedByCurrentUser();
+
+    public int getLikes();
 }

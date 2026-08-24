@@ -23,6 +23,8 @@
             <Hyperlink text="← Back to Feed" styleClass="nav-link" onAction="#onBackClicked"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Button fx:id="editButton" text="Edit" styleClass="nav-link" onAction="#onEditClicked"/>
+            <Button fx:id="changeTypeButton" text="Change Type" styleClass="nav-link"/>
+            <Button fx:id="bookmarkButton" text="Bookmark" styleClass="nav-link" onAction="#onBookmarkClicked"/>
             <Button fx:id="deleteButton" text="Delete" styleClass="nav-link" onAction="#onDeleteClicked"/>
             <Button fx:id="reportButton" text="Report" styleClass="nav-link" onAction="#onReportClicked"/>
         </HBox>
@@ -32,38 +34,45 @@
     <center>
         <ScrollPane fitToWidth="true" styleClass="scroll-pane">
             <HBox alignment="TOP_CENTER">
-            <VBox spacing="20" maxWidth="700">
-                <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+                <VBox spacing="20" maxWidth="700">
+                    <padding>
+                        <Insets top="30" right="30" bottom="30" left="30"/>
+                    </padding>
 
-                <!-- Article content -->
-                <VBox spacing="10" styleClass="card">
-                    <Label fx:id="categoryTag" styleClass="tag-chip"/>
-                    <Label fx:id="titleLabel" styleClass="article-title" wrapText="true"/>
-                    <Label fx:id="metaLabel" styleClass="article-meta"/>
-                    <Label fx:id="contentLabel" styleClass="article-body" wrapText="true">
-                        <VBox.margin><Insets top="10"/></VBox.margin>
-                    </Label>
+                    <!-- Article content -->
+                    <VBox spacing="10" styleClass="card">
+                        <Label fx:id="categoryTag" styleClass="tag-chip"/>
+                        <Label fx:id="titleLabel" styleClass="article-title" wrapText="true"/>
+                        <Label fx:id="metaLabel" styleClass="article-meta"/>
+                        <Label fx:id="contentLabel" styleClass="article-body" wrapText="true">
+                            <VBox.margin>
+                                <Insets top="10"/>
+                            </VBox.margin>
+                        </Label>
 
-                    <HBox spacing="12" alignment="CENTER_LEFT">
-                        <VBox.margin><Insets top="10"/></VBox.margin>
-                        <Button fx:id="likeButton" text="🤍 Like" styleClass="nav-link" onAction="#onLikeClicked"/>
-                        <Label fx:id="likeCountLabel" styleClass="article-meta"/>
-                    </HBox>
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <VBox.margin>
+                                <Insets top="10"/>
+                            </VBox.margin>
+                            <Button fx:id="likeButton" text="🤍 Like" styleClass="nav-link" onAction="#onLikeClicked"/>
+                            <Label fx:id="likeCountLabel" styleClass="article-meta"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- New comment box -->
+                    <VBox spacing="8" styleClass="card">
+                        <Label text="Add a comment" styleClass="field-label"/>
+                        <TextArea fx:id="newCommentField" promptText="Write a comment..." styleClass="input-field"
+                                  wrapText="true" prefRowCount="2"/>
+                        <Button text="Post Comment" styleClass="primary-btn" maxWidth="Infinity"
+                                onAction="#onPostCommentClicked"/>
+                    </VBox>
+
+                    <!-- Comments list -->
+                    <Label text="Comments" styleClass="field-label"/>
+                    <VBox fx:id="commentsContainer" spacing="12"/>
+
                 </VBox>
-
-                <!-- New comment box -->
-                <VBox spacing="8" styleClass="card">
-                    <Label text="Add a comment" styleClass="field-label"/>
-                    <TextArea fx:id="newCommentField" promptText="Write a comment..." styleClass="input-field"
-                              wrapText="true" prefRowCount="2"/>
-                    <Button text="Post Comment" styleClass="primary-btn" maxWidth="Infinity" onAction="#onPostCommentClicked"/>
-                </VBox>
-
-                <!-- Comments list -->
-                <Label text="Comments" styleClass="field-label"/>
-                <VBox fx:id="commentsContainer" spacing="12"/>
-
-            </VBox>
             </HBox>
         </ScrollPane>
     </center>
