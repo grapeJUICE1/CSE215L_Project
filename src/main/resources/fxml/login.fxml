@@ -59,12 +59,10 @@
             <PasswordField fx:id="passwordField" promptText="Enter your password" styleClass="input-field"/>
         </VBox>
 
-        <VBox spacing="6" fx:id="roleContainer" managed="false" visible="false">
-            <VBox.margin>
-                <Insets top="14"/>
-            </VBox.margin>
-            <Label text="Account Type" styleClass="field-label"/>
-            <ComboBox fx:id="roleComboBox" maxWidth="Infinity" styleClass="input-field"/>
+        <VBox spacing="6" fx:id="confirmPasswordContainer" managed="false" visible="false">
+            <VBox.margin><Insets top="14"/></VBox.margin>
+            <Label text="Confirm Password" styleClass="field-label"/>
+            <PasswordField fx:id="confirmPasswordField" promptText="Confirm your password" styleClass="input-field"/>
         </VBox>
 
         <Button fx:id="submitButton" text="Login" styleClass="primary-btn" maxWidth="Infinity"

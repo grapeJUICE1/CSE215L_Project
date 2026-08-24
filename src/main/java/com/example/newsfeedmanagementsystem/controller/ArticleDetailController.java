@@ -181,6 +181,9 @@ public class ArticleDetailController {
         deleteButton.setVisible(canDelete);
         deleteButton.setManaged(canDelete);
         deleteButton.setOnAction(e -> {
+            if (!DialogUtils.confirm("Delete Comment", "Delete this comment?", "This action cannot be undone.")) {
+                return;
+            }
             try {
                 if (parent == null) {
                     article.removeComment(comment);
@@ -321,6 +324,9 @@ public class ArticleDetailController {
 
     @FXML
     public void onDeleteClicked() {
+        if (!DialogUtils.confirm("Delete Article", "Delete this article?", "This action cannot be undone.")) {
+            return;
+        }
         try {
             moderationService.deleteArticle(article);
             ToastManager.success("Article deleted");

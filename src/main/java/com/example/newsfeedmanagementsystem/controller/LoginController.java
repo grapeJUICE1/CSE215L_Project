@@ -22,15 +22,15 @@ public class LoginController {
     @FXML
     private VBox displayNameContainer;
     @FXML
-    private VBox roleContainer;
-    @FXML
     private TextField displayNameField;
-    @FXML
-    private ComboBox<String> roleComboBox;
     @FXML
     private Button submitButton;
     @FXML
     private Hyperlink toggleModeLink;
+    @FXML
+    private VBox confirmPasswordContainer;
+    @FXML
+    private PasswordField confirmPasswordField;;
 
     private boolean isRegisterMode = false;
     private AuthService authService;
@@ -41,7 +41,6 @@ public class LoginController {
         this.userRepository = new UserRepository();
         userRepository.load();
         this.authService = new AuthService(userRepository);
-        roleComboBox.getItems().addAll("REGULAR", "JOURNALIST");
     }
 
     @FXML
@@ -54,16 +53,15 @@ public class LoginController {
         if (isRegisterMode) {
             displayNameContainer.setVisible(true);
             displayNameContainer.setManaged(true);
-            roleContainer.setVisible(true);
-            roleContainer.setManaged(true);
+            confirmPasswordContainer.setVisible(true);
+            confirmPasswordContainer.setManaged(true);
             submitButton.setText("Register!");
             toggleModeLink.setText("Already have an account? Login");
         } else {
             displayNameContainer.setVisible(false);
             displayNameContainer.setManaged(false);
-            roleContainer.setVisible(false);
-            roleContainer.setManaged(false);
-
+            confirmPasswordContainer.setVisible(false);
+            confirmPasswordContainer.setManaged(false);
             submitButton.setText("Login!");
             toggleModeLink.setText("Don't have an account? Register");
         }
@@ -74,17 +72,19 @@ public class LoginController {
         if (isRegisterMode) {
             String username = usernameField.getText();
             String password = passwordField.getText();
+            String confirm = confirmPasswordField.getText();
             String displayName = displayNameField.getText();
-            String role = (roleComboBox.getSelectionModel().getSelectedItem() == null) ?
-                    null :
-                    roleComboBox.getSelectionModel().getSelectedItem().toString();
 
-            if (username.isEmpty() || password.isEmpty() || displayName.isEmpty() || role == null) {
+            if (username.isEmpty() || password.isEmpty() || displayName.isEmpty() ) {
                 ToastManager.error("Please fill all the fields");
                 return;
             }
+            if (!password.equals(confirm)) {
+                ToastManager.error("Passwords do not match");
+                return;
+            }
             try {
-                authService.register(username, password, displayName, role);
+                authService.register(username, password, displayName, "REGULAR");
                 userRepository.save();
                 ToastManager.success("Account Crated! Please Login");
                 isRegisterMode = false;

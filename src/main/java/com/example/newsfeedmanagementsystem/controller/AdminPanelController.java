@@ -11,6 +11,7 @@ import com.example.newsfeedmanagementsystem.repository.ArticleRepository;
 import com.example.newsfeedmanagementsystem.repository.UserRepository;
 import com.example.newsfeedmanagementsystem.service.ModerationService;
 import com.example.newsfeedmanagementsystem.util.AppState;
+import com.example.newsfeedmanagementsystem.util.DialogUtils;
 import com.example.newsfeedmanagementsystem.util.SceneManager;
 import com.example.newsfeedmanagementsystem.util.ToastManager;
 import javafx.beans.property.SimpleStringProperty;
@@ -98,6 +99,9 @@ public class AdminPanelController {
             }
 
             private void handleDemote(String username) {
+                if (!DialogUtils.confirm("Demote User?",   "Demote " + username + " to Regular?", "This action can be reversed.")) {
+                    return;
+                }
                 try {
                     moderationService.demoteToRegular(username);
                     ToastManager.success("User demoted to Regular User");
@@ -211,6 +215,9 @@ public class AdminPanelController {
 
     private void handleToggleBan(String username) {
         try {
+            if (!DialogUtils.confirm("Ban User",   "Ban " + username + "?", "This action can be reversed.")) {
+                return;
+            }
             moderationService.toggleBanStatus(username);
             ToastManager.success("User ban status updated!");
             loadData();
@@ -220,6 +227,9 @@ public class AdminPanelController {
     }
 
     private void handlePromote(String username) {
+        if (!DialogUtils.confirm("Promote User?",   "Promote " + username + " to Journalist?", "This action can be reversed.")) {
+            return;
+        }
         try {
             moderationService.promoteToJournalist(username);
             ToastManager.success("User promoted to Journalist!");
@@ -230,6 +240,9 @@ public class AdminPanelController {
     }
 
     private void handleDeleteArticle(Article article) {
+        if (!DialogUtils.confirm("Delete Article", "Delete this article?", "This action cannot be undone.")) {
+            return;
+        }
         try {
             moderationService.deleteArticle(article);
             ToastManager.success("Article deleted successfully.");
