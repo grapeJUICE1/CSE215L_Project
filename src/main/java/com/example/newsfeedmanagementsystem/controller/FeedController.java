@@ -82,6 +82,17 @@ public class FeedController {
                     Label title = new Label(article.getTitle());
                     title.getStyleClass().add("article-title");
 
+                    Label bookmarkIcon = new Label();
+                    if (Session.getCurrentUser().isBookmarked(article.getId())) {
+                        bookmarkIcon.setText("⭐ ");
+                        bookmarkIcon.setStyle("-fx-font-size: 18px;");
+                    } else {
+                        bookmarkIcon.setText("");
+                    }
+
+                    HBox titleBox = new HBox(4, bookmarkIcon, title);
+                    titleBox.setAlignment(Pos.CENTER_LEFT);
+
                     HBox metaContainer = new HBox(6);
                     metaContainer.setAlignment(Pos.CENTER_LEFT);
 
@@ -121,7 +132,7 @@ public class FeedController {
                     snippet.getStyleClass().add("article-body");
                     snippet.setWrapText(true);
 
-                    card.getChildren().addAll(title, metaContainer, tag, typeBadge, snippet);
+                    card.getChildren().addAll(titleBox, metaContainer, tag, typeBadge, snippet);
                     card.setOnMouseClicked(e -> onArticleClicked(article));
 
                     setGraphic(card);
@@ -205,6 +216,8 @@ public class FeedController {
 
     @FXML
     public void onLogoutClicked() {
+        userRepository.save();
+        articleRepository.save();
         Session.logout();
         ToastManager.success("Logged out successfully");
         SceneManager.switchTo("login");

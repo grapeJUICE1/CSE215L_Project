@@ -1,6 +1,7 @@
 package com.example.newsfeedmanagementsystem.controller;
 
 import com.example.newsfeedmanagementsystem.exception.UnauthorizedActionException;
+import com.example.newsfeedmanagementsystem.exception.UserNotFoundException;
 import com.example.newsfeedmanagementsystem.model.*;
 import com.example.newsfeedmanagementsystem.repository.ArticleRepository;
 import com.example.newsfeedmanagementsystem.repository.UserRepository;
@@ -230,15 +231,23 @@ public class ArticleDetailController {
     @FXML
     public void onBookmarkClicked() {
         try {
-            Session.getCurrentUser().toggleBookmark(article.getId());
-        } catch (UnauthorizedActionException e) {
+            User current = Session.getCurrentUser();
+            if (current == null) {
+                ToastManager.error("You must be logged in to bookmark.");
+                return;
+            }
+            User repoUser = userRepository.findUserByUsername(current.getUsername());
+            repoUser.toggleBookmark(article.getId());
+            Session.login(repoUser);
+            userRepository.save();
+            updateBookmarkButton();
+            ToastManager.success(repoUser.isBookmarked(article.getId()) ? "Bookmarked" : "Unbookmarked");
+        } catch (UnauthorizedActionException | UserNotFoundException e) {
             ToastManager.error(e.getMessage());
+        } catch (Exception e) {
+            ToastManager.error("Failed to toggle bookmark: " + e.getMessage());
         }
-        userRepository.save();
-        updateBookmarkButton();
-        ToastManager.success(Session.getCurrentUser().isBookmarked(article.getId()) ? "Bookmarked" : "Unbookmarked");
     }
-
     @FXML
     public void onReplyClicked(Comment parentComment) {
         TextInputDialog dialog = new TextInputDialog();

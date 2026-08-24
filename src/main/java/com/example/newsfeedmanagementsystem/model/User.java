@@ -3,6 +3,7 @@ package com.example.newsfeedmanagementsystem.model;
 import com.example.newsfeedmanagementsystem.exception.UnauthorizedActionException;
 import com.example.newsfeedmanagementsystem.util.Session;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -129,5 +130,12 @@ public abstract class User implements Serializable {
     @Override
     public String toString() {
         return String.format("%s (@%s) [%s]", displayName, username, getClass().getSimpleName());
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        if (bookmarks == null) {
+            bookmarks = new HashSet<>();
+        }
     }
 }
