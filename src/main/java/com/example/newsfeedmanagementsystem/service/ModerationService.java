@@ -53,7 +53,21 @@ public class ModerationService {
         userRepository.addUser(newJournalist);
         userRepository.save();
     }
+    public void demoteToRegular(String username) throws UnauthorizedActionException, UserNotFoundException, DuplicateUserException {
+        verifyAdmin();
+        User user = userRepository.findUserByUsername(username);
+        if (!(user instanceof Journalist)) {
+            throw new UnauthorizedActionException("User is not a Journalist.");
+        }
 
+        RegularUser regular = new RegularUser(user.getUsername(), user.getPasswordHash(), user.getDisplayName() , user.getBookmarkIds());
+        if (user.isBanned()) {
+            regular.setBanned(true);
+        }
+        userRepository.removeUser(user);
+        userRepository.addUser(regular);
+        userRepository.save();
+    }
     public void toggleBanStatus(String username) throws UnauthorizedActionException, UserNotFoundException {
         verifyAdmin();
         User user = userRepository.findUserByUsername(username);

@@ -3,7 +3,9 @@ package com.example.newsfeedmanagementsystem.controller;
 import com.example.newsfeedmanagementsystem.exception.DuplicateUserException;
 import com.example.newsfeedmanagementsystem.exception.UnauthorizedActionException;
 import com.example.newsfeedmanagementsystem.exception.UserNotFoundException;
+import com.example.newsfeedmanagementsystem.model.Admin;
 import com.example.newsfeedmanagementsystem.model.Article;
+import com.example.newsfeedmanagementsystem.model.Journalist;
 import com.example.newsfeedmanagementsystem.model.User;
 import com.example.newsfeedmanagementsystem.repository.ArticleRepository;
 import com.example.newsfeedmanagementsystem.repository.UserRepository;
@@ -71,7 +73,7 @@ public class AdminPanelController {
 
         actionsCol.setCellFactory(col -> new TableCell<>() {
             private final Button banBtn = new Button();
-            private final Button promoteBtn = new Button("Promote to Journalist");
+            private final Button promoteBtn = new Button();
             private final HBox container = new HBox(8, banBtn, promoteBtn);
 
             {
@@ -87,8 +89,22 @@ public class AdminPanelController {
                 promoteBtn.setOnAction(e -> {
                     e.consume();
                     User user = getTableView().getItems().get(getIndex());
-                    handlePromote(user.getUsername());
+                    if (user instanceof Journalist) {
+                        handleDemote(user.getUsername());
+                    } else if (!(user instanceof Admin)) {
+                        handlePromote(user.getUsername());
+                    }
                 });
+            }
+
+            private void handleDemote(String username) {
+                try {
+                    moderationService.demoteToRegular(username);
+                    ToastManager.success("User demoted to Regular User");
+                    loadData();
+                } catch (UnauthorizedActionException | UserNotFoundException | DuplicateUserException e) {
+                    ToastManager.error(e.getMessage());
+                }
             }
 
             @Override
@@ -99,9 +115,19 @@ public class AdminPanelController {
                 } else {
                     User user = getTableView().getItems().get(getIndex());
                     banBtn.setText(user.isBanned() ? "Unban" : "Ban");
-                    promoteBtn.setVisible(!(user instanceof com.example.newsfeedmanagementsystem.model.Journalist)
-                            && !(user instanceof com.example.newsfeedmanagementsystem.model.Admin));
-                    promoteBtn.setManaged(promoteBtn.isVisible());
+
+                    if (user instanceof Admin) {
+                        promoteBtn.setVisible(false);
+                        promoteBtn.setManaged(false);
+                    } else if (user instanceof Journalist) {
+                        promoteBtn.setText("Demote to Regular");
+                        promoteBtn.setVisible(true);
+                        promoteBtn.setManaged(true);
+                    } else {
+                        promoteBtn.setText("Promote to Journalist");
+                        promoteBtn.setVisible(true);
+                        promoteBtn.setManaged(true);
+                    }
                     setGraphic(container);
                 }
             }
