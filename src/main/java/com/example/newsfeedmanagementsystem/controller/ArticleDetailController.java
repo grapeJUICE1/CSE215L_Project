@@ -348,7 +348,6 @@ public class ArticleDetailController {
         articleRepository.addArticle(newArticle);
         articleRepository.save();
         article = newArticle;
-        renderArticle();
         ToastManager.success("Article type changed to " + newType);
     }
 
