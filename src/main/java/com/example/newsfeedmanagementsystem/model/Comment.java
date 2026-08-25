@@ -3,6 +3,7 @@ package com.example.newsfeedmanagementsystem.model;
 import com.example.newsfeedmanagementsystem.exception.UnauthorizedActionException;
 import com.example.newsfeedmanagementsystem.util.Session;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,6 +13,7 @@ public class Comment implements Serializable, Commentable {
     private User author;
     private String content;
     private Date timestamp = new Date();
+    @Serial
     private static final long serialVersionUID = 1L;
     private List<Comment> replies;
 
@@ -29,7 +31,7 @@ public class Comment implements Serializable, Commentable {
     public void setAuthor(User author) throws UnauthorizedActionException {
         User currentUser = Session.getCurrentUser();
 
-        if ((currentUser == null) || !(currentUser instanceof Admin)) {
+        if (!(currentUser instanceof Admin)) {
             throw new UnauthorizedActionException("You are not allowed to perform this action");
         }
 
@@ -38,15 +40,6 @@ public class Comment implements Serializable, Commentable {
 
     public String getContent() {
         return content;
-    }
-
-    public void editContent(String newContent) throws UnauthorizedActionException {
-        User currentUser = Session.getCurrentUser();
-        if (!this.author.equals(currentUser)) {
-            throw new UnauthorizedActionException("You are not allowed to perform this action");
-        }
-
-        this.content = newContent;
     }
 
     public Date getTimestamp() {

@@ -3,7 +3,7 @@ package com.example.newsfeedmanagementsystem.model;
 import com.example.newsfeedmanagementsystem.exception.UnauthorizedActionException;
 import com.example.newsfeedmanagementsystem.util.Session;
 
-import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,6 +14,7 @@ public abstract class User implements Serializable {
     private String displayName;
     private boolean isBanned = false;
     private Set<String> bookmarks = new HashSet<>();
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public User(String username, String passwordHash, String displayName) {
@@ -42,7 +43,7 @@ public abstract class User implements Serializable {
     public void setPasswordHash(String passwordHash) throws UnauthorizedActionException {
         User currentUser = Session.getCurrentUser();
 
-        if (currentUser == null || !this.equals(currentUser)) {
+        if (!this.equals(currentUser)) {
             throw new UnauthorizedActionException("You are not allowed to perform this action");
         }
         this.passwordHash = passwordHash;
@@ -59,7 +60,7 @@ public abstract class User implements Serializable {
     public void setBanned(boolean banned) throws UnauthorizedActionException {
         User currentUser = Session.getCurrentUser();
 
-        if (currentUser == null || !(currentUser instanceof Admin)) {
+        if ( !(currentUser instanceof Admin)) {
             throw new UnauthorizedActionException("You are not allowed to perform this action");
         }
         isBanned = banned;
@@ -67,20 +68,6 @@ public abstract class User implements Serializable {
 
     public boolean isBookmarked(String articleId) {
         return bookmarks.contains(articleId);
-    }
-
-    public void addBookmark(String articleId) throws UnauthorizedActionException {
-        User currentUser = Session.getCurrentUser();
-        if (currentUser == null || !currentUser.username.equals(this.username))
-            throw new UnauthorizedActionException("You are not allowed to perform this action");
-        bookmarks.add(articleId);
-    }
-
-    public void removeBookmark(String articleId) throws UnauthorizedActionException {
-        User currentUser = Session.getCurrentUser();
-        if (currentUser == null || !currentUser.username.equals(this.username))
-            throw new UnauthorizedActionException("You are not allowed to perform this action");
-        bookmarks.remove(articleId);
     }
 
     public void toggleBookmark(String articleId) throws UnauthorizedActionException {
@@ -132,10 +119,4 @@ public abstract class User implements Serializable {
         return String.format("%s (@%s) [%s]", displayName, username, getClass().getSimpleName());
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        if (bookmarks == null) {
-            bookmarks = new HashSet<>();
-        }
-    }
 }

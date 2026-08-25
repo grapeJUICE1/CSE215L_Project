@@ -31,6 +31,8 @@ public class LoginController {
     private VBox confirmPasswordContainer;
     @FXML
     private PasswordField confirmPasswordField;
+    @FXML
+    private ToggleButton darkModeToggle;
     ;
 
     private boolean isRegisterMode = false;
@@ -114,6 +116,6 @@ public class LoginController {
 
     @FXML
     public void onDarkModeToggleClicked() {
-        ThemeManager.toggleTheme(usernameField.getScene());
+        ThemeManager.toggleTheme(darkModeToggle.getScene());
     }
 }

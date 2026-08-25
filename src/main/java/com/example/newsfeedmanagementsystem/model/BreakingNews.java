@@ -5,8 +5,4 @@ public class BreakingNews extends Article {
         super(title, content, author, category);
     }
 
-    @Override
-    public String render() {
-        return "breaking news";
-    }
 }

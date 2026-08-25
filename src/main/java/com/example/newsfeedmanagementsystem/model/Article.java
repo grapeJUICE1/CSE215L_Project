@@ -3,6 +3,7 @@ package com.example.newsfeedmanagementsystem.model;
 import com.example.newsfeedmanagementsystem.exception.UnauthorizedActionException;
 import com.example.newsfeedmanagementsystem.util.Session;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 
@@ -16,6 +17,7 @@ public abstract class Article implements Serializable, Likeable, Commentable {
     private int reportCount;
     private Set<String> likedBy;
     private Set<String> reportedBy;
+    @Serial
     private static final long serialVersionUID = 1L;
     private List<Comment> comments;
     private String id;
@@ -29,8 +31,6 @@ public abstract class Article implements Serializable, Likeable, Commentable {
 
         this.comments = new ArrayList<>();
     }
-
-    public abstract String render();
 
     public String getId() {
         return id;

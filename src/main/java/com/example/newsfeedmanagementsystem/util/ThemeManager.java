@@ -5,10 +5,6 @@ import javafx.scene.Scene;
 public class ThemeManager {
     private static boolean darkMode = true;
 
-    public static boolean isDarkMode() {
-        return darkMode;
-    }
-
     public static void applyTheme(Scene scene) {
         if (scene == null) return;
         scene.getStylesheets().clear();
