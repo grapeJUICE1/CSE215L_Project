@@ -82,22 +82,31 @@
 
 .primary-btn {
     -fx-background-color: #4f9de8;
+    -fx-background-insets: 0;
+    -fx-background-radius: 8;
+    -fx-border-width: 0;
     -fx-text-fill: #0b0e14;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
-    -fx-background-radius: 8;
-    -fx-padding: 12 0 12 0;
+    -fx-padding: 10 20 10 20;
     -fx-cursor: hand;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
 }
-
 .primary-btn:hover {
     -fx-background-color: #6bb0ee;
+    -fx-background-insets: 0;
 }
 
 .primary-btn:pressed {
     -fx-background-color: #3f89d0;
+    -fx-background-insets: 0;
 }
 
+.primary-btn:default {
+    -fx-background-color: #4f9de8;
+    -fx-background-insets: 0;
+}
 .toggle-link {
     -fx-text-fill: #7d879b;
     -fx-font-size: 13px;

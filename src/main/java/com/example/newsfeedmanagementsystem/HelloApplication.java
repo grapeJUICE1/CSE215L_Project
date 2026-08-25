@@ -11,8 +11,4 @@ public class HelloApplication extends Application {
         primaryStage.setTitle("News Feed Management System");
         SceneManager.switchTo("login");
     }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
 }

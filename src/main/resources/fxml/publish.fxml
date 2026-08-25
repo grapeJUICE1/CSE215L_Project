@@ -57,7 +57,7 @@
                 <VBox spacing="6">
                     <Label text="Content" styleClass="field-label"/>
                     <TextArea fx:id="contentField" promptText="Write your article..." styleClass="input-field"
-                              wrapText="true" prefRowCount="10"/>
+                              wrapText="true"/>
                 </VBox>
 
                 <Button text="Publish" styleClass="primary-btn" maxWidth="Infinity" onAction="#onPublishClicked">

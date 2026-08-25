@@ -33,7 +33,6 @@ public class LoginController {
     private PasswordField confirmPasswordField;
     @FXML
     private ToggleButton darkModeToggle;
-    ;
 
     private boolean isRegisterMode = false;
     private AuthService authService;

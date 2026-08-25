@@ -38,6 +38,8 @@ public class FeedController {
     private Button nextPageButton;
     @FXML
     private Label emptyFeedLabel;
+    @FXML
+    private ToggleButton darkModeToggle;
 
     private UserRepository userRepository;
     private ArticleRepository articleRepository;
@@ -61,7 +63,6 @@ public class FeedController {
         sortModeBox.setValue("recency");
 
         boolean canPublish = Session.getCurrentUser() != null && Session.getCurrentUser().canPublish();
-        System.out.println(canPublish);
         publishButton.setVisible(canPublish);
         publishButton.setManaged(canPublish);
 
@@ -158,7 +159,6 @@ public class FeedController {
 
         List<Article> feed = feedService.getFeed(articleRepository.getAllArticles(),
                 search, category, null, sort, currentPage, PAGE_SIZE, type);
-        ;
         articleListView.getItems().clear();
         articleListView.getItems().addAll(feed);
 
@@ -248,6 +248,6 @@ public class FeedController {
 
     @FXML
     public void onDarkModeToggleClicked() {
-        ThemeManager.toggleTheme(searchField.getScene());
+        ThemeManager.toggleTheme(darkModeToggle.getScene());
     }
 }

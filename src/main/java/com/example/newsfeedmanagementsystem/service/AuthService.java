@@ -11,6 +11,7 @@ import com.example.newsfeedmanagementsystem.model.User;
 import com.example.newsfeedmanagementsystem.util.PasswordHasher;
 import com.example.newsfeedmanagementsystem.repository.UserRepository;
 import com.example.newsfeedmanagementsystem.util.Session;
+import com.example.newsfeedmanagementsystem.util.ToastManager;
 
 public class AuthService {
     UserRepository userRepository;
@@ -21,25 +22,11 @@ public class AuthService {
 
     public User register(String username, String password, String displayName, String role) throws DuplicateUserException {
         String hashedPassword = PasswordHasher.hashPassword(password);
-        User newUser;
-
-        switch (role) {
-            case "ADMIN":
-                newUser = new Admin(username, hashedPassword, displayName);
-                break;
-
-            case "USER":
-                newUser = new RegularUser(username, hashedPassword, displayName);
-                break;
-
-            case "Journalist":
-                newUser = new Journalist(username, hashedPassword, displayName);
-                break;
-
-            default:
-                newUser = new RegularUser(username, hashedPassword, displayName);
-                break;
-        }
+        User newUser = switch (role) {
+            case "ADMIN" -> new Admin(username, hashedPassword, displayName);
+            case "Journalist" -> new Journalist(username, hashedPassword, displayName);
+            default -> new RegularUser(username, hashedPassword, displayName);
+        };
 
         userRepository.addUser(newUser);
 
@@ -71,6 +58,7 @@ public class AuthService {
             User repoUser = userRepository.findUserByUsername(currentUser.getUsername());
             repoUser.setPasswordHash(newHash);
         } catch (UserNotFoundException e) {
+            ToastManager.error(e.getMessage());
         }
 
         userRepository.save();

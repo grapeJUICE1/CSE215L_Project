@@ -49,19 +49,19 @@ public class PublishController {
         String type = typeBox.getValue();
         String content = contentField.getText();
 
-        if (title == null || title.length() == 0) {
+        if (title == null || title.isEmpty()) {
             errorLabel.setText("Please enter a title");
             return;
         }
-        if (category == null || category.length() == 0) {
+        if (category == null || category.isEmpty()) {
             errorLabel.setText("Please enter a category");
             return;
         }
-        if (type == null || type.length() == 0) {
+        if (type == null || type.isEmpty()) {
             errorLabel.setText("Please enter a type");
             return;
         }
-        if (content.length() == 0) {
+        if (content.isEmpty()) {
             errorLabel.setText("Please enter content");
             return;
         }

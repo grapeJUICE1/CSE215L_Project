@@ -78,12 +78,10 @@ public class Seed {
         }
         System.out.println("Created " + articles.size() + " articles.");
 
-        List<User> commenters = users;
-
         for (Article article : articles) {
             int numComments = 2 + rand.nextInt(4);
             for (int c = 0; c < numComments; c++) {
-                User commenter = commenters.get(rand.nextInt(commenters.size()));
+                User commenter = users.get(rand.nextInt(users.size()));
                 Session.login(commenter);
                 String commentText = "Great article! " + UUID.randomUUID().toString().substring(0, 6);
                 Comment comment = new Comment(commenter, commentText);
@@ -94,7 +92,7 @@ public class Seed {
                 }
 
                 if (rand.nextBoolean()) {
-                    User replier = commenters.get(rand.nextInt(commenters.size()));
+                    User replier = users.get(rand.nextInt(users.size()));
                     Session.login(replier);
                     String replyText = "Reply: " + UUID.randomUUID().toString().substring(0, 5);
                     Comment reply = new Comment(replier, replyText);
@@ -121,12 +119,12 @@ public class Seed {
 
         for (int i = 0; i < 3; i++) {
             Article art = articles.get(rand.nextInt(articles.size()));
-            User reporter = commenters.get(rand.nextInt(commenters.size()));
+            User reporter = users.get(rand.nextInt(users.size()));
             Session.login(reporter);
             if (art.report()) {
                 System.out.println("Reported: " + art.getTitle());
             }
-            User reporter2 = commenters.get(rand.nextInt(commenters.size()));
+            User reporter2 = users.get(rand.nextInt(users.size()));
             Session.login(reporter2);
             if (art.report()) {
                 System.out.println("Reported again: " + art.getTitle());
@@ -141,13 +139,13 @@ public class Seed {
         System.out.println("Users: " + userRepo.getAllUsers().size());
         System.out.println("Articles: " + articleRepo.getAllArticles().size());
         long totalComments = articleRepo.getAllArticles().stream()
-                .flatMap(a -> a.getComments().stream())
-                .count();
+                .mapToLong(a -> a.getComments().size())
+                .sum();
         System.out.println("Comments: " + totalComments);
         long totalReplies = articleRepo.getAllArticles().stream()
                 .flatMap(a -> a.getComments().stream())
-                .flatMap(c -> c.getReplies().stream())
-                .count();
+                .mapToLong(c -> c.getReplies().size())
+                .sum();
         System.out.println("Replies: " + totalReplies);
         System.out.println("Seed completed.");
     }

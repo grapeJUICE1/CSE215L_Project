@@ -76,15 +76,11 @@ public class ToastManager {
     }
 
     private static String colorFor(Type type) {
-        switch (type) {
-            case SUCCESS:
-                return "#2ea043"; // green
-            case ERROR:
-                return "#e5484d"; // red
-            case INFO:
-            default:
-                return "#4f9de8"; // blue
-        }
+        return switch (type) {
+            case SUCCESS -> "#2ea043"; // green
+            case ERROR -> "#e5484d"; // red
+            default -> "#4f9de8"; // blue
+        };
     }
 
     public static void showLoading(String message) {
