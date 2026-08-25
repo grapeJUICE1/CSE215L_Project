@@ -35,8 +35,12 @@ public class FeedService {
 
     private List<Article> sortByRecency(List<Article> articles) {
         List<Article> articlesCopy = new ArrayList<>(articles);
-        articlesCopy.sort(Comparator.comparing(Article::getPublishedAt).reversed());
 
+        articlesCopy.sort(
+                Comparator.comparing(Article::getPublishedAt).
+                        thenComparing(Article::getId).reversed()
+        );
+        
         return articlesCopy;
     }
 
