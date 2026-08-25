@@ -30,7 +30,8 @@ public class LoginController {
     @FXML
     private VBox confirmPasswordContainer;
     @FXML
-    private PasswordField confirmPasswordField;;
+    private PasswordField confirmPasswordField;
+    ;
 
     private boolean isRegisterMode = false;
     private AuthService authService;
@@ -75,7 +76,7 @@ public class LoginController {
             String confirm = confirmPasswordField.getText();
             String displayName = displayNameField.getText();
 
-            if (username.isEmpty() || password.isEmpty() || displayName.isEmpty() ) {
+            if (username.isEmpty() || password.isEmpty() || displayName.isEmpty()) {
                 ToastManager.error("Please fill all the fields");
                 return;
             }

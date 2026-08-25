@@ -98,7 +98,7 @@ public abstract class User implements Serializable {
     public Set<String> getBookmarkIds() throws UnauthorizedActionException {
         User currentUser = Session.getCurrentUser();
 
-        if(currentUser != null && (currentUser instanceof Admin || currentUser.username.equals(this.username))){
+        if (currentUser != null && (currentUser instanceof Admin || currentUser.username.equals(this.username))) {
             return new HashSet<>(bookmarks);
         }
         throw new UnauthorizedActionException("You are not allowed to perform this action");

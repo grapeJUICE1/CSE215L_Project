@@ -7,12 +7,10 @@ import com.example.newsfeedmanagementsystem.model.User;
 import com.example.newsfeedmanagementsystem.repository.ArticleRepository;
 import com.example.newsfeedmanagementsystem.util.SceneManager;
 import com.example.newsfeedmanagementsystem.util.Session;
+import com.example.newsfeedmanagementsystem.util.ThemeManager;
 import com.example.newsfeedmanagementsystem.util.ToastManager;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 public class PublishController {
     @FXML
@@ -25,6 +23,8 @@ public class PublishController {
     private TextArea contentField;
     @FXML
     private Label errorLabel;
+    @FXML
+    private ToggleButton darkModeToggle;
 
     private ArticleRepository articleRepository;
 
@@ -78,6 +78,11 @@ public class PublishController {
         articleRepository.save();
         ToastManager.success("Successfully published article");
         SceneManager.switchTo("feed");
+    }
+
+    @FXML
+    public void onDarkModeToggleClicked() {
+        ThemeManager.toggleTheme(darkModeToggle.getScene());
     }
 
     @FXML

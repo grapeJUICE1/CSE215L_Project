@@ -54,6 +54,10 @@
     <center>
         <VBox spacing="0">
             <ListView fx:id="articleListView" styleClass="list-view" VBox.vgrow="ALWAYS"/>
+            <Label fx:id="emptyFeedLabel" text="No articles found. Try adjusting your filters."
+                   styleClass="placeholder-label" visible="false" managed="false"
+                   alignment="CENTER" textAlignment="CENTER"
+                   maxWidth="Infinity" prefHeight="100"/>
         </VBox>
     </center>
 

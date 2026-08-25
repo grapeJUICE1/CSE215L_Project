@@ -14,6 +14,7 @@
 
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.ToggleButton?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.newsfeedmanagementsystem.controller.ProfileController"
@@ -26,6 +27,8 @@
             <Hyperlink text="← Back to Feed" styleClass="nav-link" onAction="#onBackClicked"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="headerLabel" text="User Profile" styleClass="nav-title"/>
+            <ToggleButton fx:id="darkModeToggle" text="🌙" styleClass="theme-toggle-btn"
+                          onAction="#onDarkModeToggleClicked"/>
         </HBox>
     </top>
 
@@ -73,17 +76,29 @@
             </VBox>
 
             <VBox spacing="12" HBox.hgrow="ALWAYS" maxWidth="580">
-                <TabPane fx:id="profileTabPane"  tabClosingPolicy="UNAVAILABLE">
+                <TabPane fx:id="profileTabPane" tabClosingPolicy="UNAVAILABLE">
                     <Tab text="Published Articles">
                         <VBox spacing="12">
-                            <padding><Insets top="12" right="8" bottom="8" left="8"/></padding>
+                            <padding>
+                                <Insets top="12" right="8" bottom="8" left="8"/>
+                            </padding>
                             <ListView fx:id="userArticlesListView" styleClass="list-view" VBox.vgrow="ALWAYS"/>
+                            <Label fx:id="emptyUserArticlesLabel" text="You haven't published any articles yet."
+                                   styleClass="placeholder-label" visible="false" managed="false"
+                                   alignment="CENTER" textAlignment="CENTER"
+                                   maxWidth="Infinity" prefHeight="100"/>
                         </VBox>
                     </Tab>
                     <Tab text="Bookmarks">
                         <VBox spacing="12">
-                            <padding><Insets top="12" right="8" bottom="8" left="8"/></padding>
+                            <padding>
+                                <Insets top="12" right="8" bottom="8" left="8"/>
+                            </padding>
                             <ListView fx:id="bookmarksListView" styleClass="list-view" VBox.vgrow="ALWAYS"/>
+                            <Label fx:id="emptyBookmarksLabel" text="You haven't bookmarked any articles."
+                                   styleClass="placeholder-label" visible="false" managed="false"
+                                   alignment="CENTER" textAlignment="CENTER"
+                                   maxWidth="Infinity" prefHeight="100"/>
                         </VBox>
                     </Tab>
                 </TabPane>

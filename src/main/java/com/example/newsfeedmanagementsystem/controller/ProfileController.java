@@ -42,6 +42,12 @@ public class ProfileController {
     private ListView<Article> bookmarksListView;
     @FXML
     private TabPane profileTabPane;
+    @FXML
+    private Label emptyUserArticlesLabel;
+    @FXML
+    private Label emptyBookmarksLabel;
+    @FXML
+    private ToggleButton darkModeToggle;
 
     private UserRepository userRepository;
     private ArticleRepository articleRepository;
@@ -109,6 +115,8 @@ public class ProfileController {
         boolean canPublish = targetUser.canPublish();
         userArticlesListView.setVisible(canPublish);
         userArticlesListView.setManaged(canPublish);
+        emptyUserArticlesLabel.setVisible(!canPublish);
+        emptyUserArticlesLabel.setManaged(!canPublish);
 
         if (canPublish) {
             userArticlesListView.setCellFactory(list -> new ListCell<Article>() {
@@ -153,6 +161,16 @@ public class ProfileController {
         if (targetUser.canPublish()) {
             List<Article> userArticles = articleRepository.getArticlesByUser(targetUser);
             userArticlesListView.getItems().setAll(userArticles);
+
+            boolean hasItems = !userArticlesListView.getItems().isEmpty();
+            emptyUserArticlesLabel.setVisible(!hasItems);
+            emptyUserArticlesLabel.setManaged(!hasItems);
+
+            if (!isSelfProfile) {
+                emptyUserArticlesLabel.setText(targetUser.getDisplayName() + " hasn't published any articles yet.");
+            } else {
+                emptyUserArticlesLabel.setText("You haven't published any articles yet.");
+            }
         }
     }
 
@@ -192,6 +210,10 @@ public class ProfileController {
                     .filter(a -> ids.contains(a.getId()))
                     .collect(Collectors.toList());
             bookmarksListView.getItems().setAll(bookmarked);
+
+            boolean hasItems = !bookmarksListView.getItems().isEmpty();
+            emptyBookmarksLabel.setVisible(!hasItems);
+            emptyBookmarksLabel.setManaged(!hasItems);
         } catch (UnauthorizedActionException e) {
             ToastManager.error(e.getMessage());
         }
@@ -230,6 +252,11 @@ public class ProfileController {
         } catch (InvalidCredentialsException | UnauthorizedActionException e) {
             ToastManager.error(e.getMessage());
         }
+    }
+
+    @FXML
+    public void onDarkModeToggleClicked() {
+        ThemeManager.toggleTheme(darkModeToggle.getScene());
     }
 
     @FXML

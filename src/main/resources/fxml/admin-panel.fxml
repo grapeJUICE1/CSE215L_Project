@@ -15,6 +15,8 @@
         <Button text="← Back to Feed" onAction="#onBackClicked" styleClass="button-secondary"/>
         <Region HBox.hgrow="ALWAYS"/>
         <Label text="Admin Dashboard &amp; Moderation" styleClass="nav-title"/>
+        <ToggleButton fx:id="darkModeToggle" text="🌙" styleClass="theme-toggle-btn"
+                      onAction="#onDarkModeToggleClicked"/>
     </HBox>
 
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
@@ -35,6 +37,10 @@
                         <TableColumn fx:id="actionsCol" text="Actions" prefWidth="220"/>
                     </columns>
                 </TableView>
+                <Label fx:id="emptyUsersLabel" text="No users registered."
+                       styleClass="placeholder-label" visible="false" managed="false"
+                       alignment="CENTER" textAlignment="CENTER"
+                       maxWidth="Infinity" prefHeight="100"/>
             </VBox>
         </Tab>
 
@@ -44,9 +50,13 @@
                     <Insets top="12" right="8" bottom="8" left="8"/>
                 </padding>
                 <HBox spacing="12">
-                    <CheckBox fx:id="showReportedOnlyCheckBox" text="Show only reported articles" />
+                    <CheckBox fx:id="showReportedOnlyCheckBox" text="Show only reported articles"/>
                 </HBox>
                 <ListView fx:id="articleListView" VBox.vgrow="ALWAYS"/>
+                <Label fx:id="emptyModerationLabel" text="No articles to moderate."
+                       styleClass="placeholder-label" visible="false" managed="false"
+                       alignment="CENTER" textAlignment="CENTER"
+                       maxWidth="Infinity" prefHeight="100"/>
             </VBox>
         </Tab>
     </TabPane>

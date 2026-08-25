@@ -36,6 +36,8 @@ public class FeedController {
     private Button prevPageButton;
     @FXML
     private Button nextPageButton;
+    @FXML
+    private Label emptyFeedLabel;
 
     private UserRepository userRepository;
     private ArticleRepository articleRepository;
@@ -159,6 +161,11 @@ public class FeedController {
         ;
         articleListView.getItems().clear();
         articleListView.getItems().addAll(feed);
+
+        boolean hasItems = !articleListView.getItems().isEmpty();
+        emptyFeedLabel.setVisible(!hasItems);
+        emptyFeedLabel.setManaged(!hasItems);
+
         updatePaginationButtons();
         pageLabel.setText("Page " + (currentPage + 1));
     }

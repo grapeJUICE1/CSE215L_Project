@@ -42,6 +42,8 @@ public class ArticleDetailController {
     private Button changeTypeButton;
     @FXML
     private HBox metaContainer;
+    @FXML
+    private ToggleButton darkModeToggle;
 
     private ArticleRepository articleRepository;
     private UserRepository userRepository;
@@ -251,6 +253,7 @@ public class ArticleDetailController {
             ToastManager.error("Failed to toggle bookmark: " + e.getMessage());
         }
     }
+
     @FXML
     public void onReplyClicked(Comment parentComment) {
         TextInputDialog dialog = new TextInputDialog();
@@ -347,6 +350,11 @@ public class ArticleDetailController {
         article = newArticle;
         renderArticle();
         ToastManager.success("Article type changed to " + newType);
+    }
+
+    @FXML
+    public void onDarkModeToggleClicked() {
+        ThemeManager.toggleTheme(darkModeToggle.getScene());
     }
 
     @FXML

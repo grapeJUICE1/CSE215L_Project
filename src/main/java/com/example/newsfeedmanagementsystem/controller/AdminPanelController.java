@@ -10,10 +10,7 @@ import com.example.newsfeedmanagementsystem.model.User;
 import com.example.newsfeedmanagementsystem.repository.ArticleRepository;
 import com.example.newsfeedmanagementsystem.repository.UserRepository;
 import com.example.newsfeedmanagementsystem.service.ModerationService;
-import com.example.newsfeedmanagementsystem.util.AppState;
-import com.example.newsfeedmanagementsystem.util.DialogUtils;
-import com.example.newsfeedmanagementsystem.util.SceneManager;
-import com.example.newsfeedmanagementsystem.util.ToastManager;
+import com.example.newsfeedmanagementsystem.util.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,6 +19,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AdminPanelController {
@@ -37,11 +35,16 @@ public class AdminPanelController {
     private TableColumn<User, String> statusCol;
     @FXML
     private TableColumn<User, Void> actionsCol;
-
     @FXML
     private ListView<Article> articleListView;
     @FXML
-    private CheckBox showReportedOnlyCheckBox; // NEW
+    private CheckBox showReportedOnlyCheckBox;
+    @FXML
+    private Label emptyModerationLabel;
+    @FXML
+    private Label emptyUsersLabel;
+    @FXML
+    private ToggleButton darkModeToggle;
 
     private UserRepository userRepository;
     private ArticleRepository articleRepository;
@@ -99,7 +102,7 @@ public class AdminPanelController {
             }
 
             private void handleDemote(String username) {
-                if (!DialogUtils.confirm("Demote User?",   "Demote " + username + " to Regular?", "This action can be reversed.")) {
+                if (!DialogUtils.confirm("Demote User?", "Demote " + username + " to Regular?", "This action can be reversed.")) {
                     return;
                 }
                 try {
@@ -196,6 +199,11 @@ public class AdminPanelController {
 
     private void loadData() {
         userList.setAll(userRepository.getAllUsers());
+
+        boolean hasItems = !userList.isEmpty();
+        emptyUsersLabel.setVisible(!hasItems);
+        emptyUsersLabel.setManaged(!hasItems);
+
         loadArticles();
     }
 
@@ -211,11 +219,14 @@ public class AdminPanelController {
             articles = articleRepository.getAllArticles();
         }
         articleList.setAll(articles);
+        boolean hasItems = !articleList.isEmpty();
+        emptyModerationLabel.setVisible(!hasItems);
+        emptyModerationLabel.setManaged(!hasItems);
     }
 
     private void handleToggleBan(String username) {
         try {
-            if (!DialogUtils.confirm("Ban User",   "Ban " + username + "?", "This action can be reversed.")) {
+            if (!DialogUtils.confirm("Ban User", "Ban " + username + "?", "This action can be reversed.")) {
                 return;
             }
             moderationService.toggleBanStatus(username);
@@ -227,7 +238,7 @@ public class AdminPanelController {
     }
 
     private void handlePromote(String username) {
-        if (!DialogUtils.confirm("Promote User?",   "Promote " + username + " to Journalist?", "This action can be reversed.")) {
+        if (!DialogUtils.confirm("Promote User?", "Promote " + username + " to Journalist?", "This action can be reversed.")) {
             return;
         }
         try {
@@ -250,6 +261,11 @@ public class AdminPanelController {
         } catch (UnauthorizedActionException e) {
             ToastManager.error(e.getMessage());
         }
+    }
+
+    @FXML
+    public void onDarkModeToggleClicked() {
+        ThemeManager.toggleTheme(darkModeToggle.getScene());
     }
 
     @FXML

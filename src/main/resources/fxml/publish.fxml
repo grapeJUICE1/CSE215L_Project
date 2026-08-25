@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.ToggleButton?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.newsfeedmanagementsystem.controller.PublishController"
@@ -23,6 +24,8 @@
             <Hyperlink text="← Back to Feed" styleClass="nav-link" onAction="#onBackClicked"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label text="Publish Article" styleClass="nav-title"/>
+            <ToggleButton fx:id="darkModeToggle" text="🌙" styleClass="theme-toggle-btn"
+                          onAction="#onDarkModeToggleClicked"/>
         </HBox>
     </top>
 
