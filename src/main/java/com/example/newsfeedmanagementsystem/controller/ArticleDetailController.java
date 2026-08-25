@@ -94,12 +94,12 @@ public class ArticleDetailController {
 
     private void updateLikeButton() {
         if (Session.getCurrentUser() == null) {
-            likeButton.setText("🤍 Like");
+            likeButton.setText("❤ Like");
             likeButton.setDisable(true);
             return;
         }
         boolean liked = article.isLikedByCurrentUser();
-        likeButton.setText(liked ? "❤️ Unlike" : "🤍 Like");
+        likeButton.setText(liked ? "🤍 Unlike" : "❤ Like");
         likeButton.setDisable(false);
     }
 
